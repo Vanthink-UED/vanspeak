@@ -1,6 +1,5 @@
-var bubbleSort = require('../src/vanspeak.js');
-it('Bubble Sort', function () {
-    let inputArr = [1,111,2,12,180,500,-12,0];
-    let outputArr = bubbleSort(inputArr);
-    expect(outputArr).toEqual([-12,0,1,2 ,12,111,180,500]);
+var vanspeak = require('../src/vanspeak.js');
+var word = 'funny';
+it('is it a word', function () {
+    expect(vanspeak.isWord(word)).toEqual(true);
 });

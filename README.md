@@ -1,4 +1,4 @@
-# van_speak
+# vanspeak.js
 
 [![Build Status](https://travis-ci.org/Vanthink-UED/vanspeak.svg?branch=master)](https://travis-ci.org/Vanthink-UED/vanspeak)
 
