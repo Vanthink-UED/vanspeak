@@ -8,6 +8,9 @@ body{
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, 'Microsoft Yahei', SimHei, arial, sans-serif;
     background:#e3e3e3;
 }
+html,body{
+  height: 100%;
+}
 .page{
     position: relative;
     width: 100%;
@@ -43,6 +46,12 @@ h2{
 }
 ul{
     padding-left: 40px;
+}
+.js-navbar{
+  display: none;
+}
+.js-navbar.active{
+  display: block;
 }
 .doc-hd{
     min-height: 75vh;
@@ -162,4 +171,14 @@ pre{
 }
 .hljs-strong {
   font-weight: bold;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover{
+  background: transparent;
+  color: #df2d70;
+}
+.btn{
+  border-radius: 0;
+  transition: all .2s ease-in;
+  padding: 8px 30px;
 }

@@ -1,112 +1,135 @@
-
-
 <!doctype html>
+
 <html lang="zh-CN">
+
 <head>
-    <title>Use JavaScipt to Speech Your Text / Events of Jack Pu</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,user-scalable=0,initial-scale=1,maximum-scale=1">
-    <meta content="yes" name="apple-mobile-web-app-capable">
-    <meta content="yes" name="apple-touch-fullscreen">
-    <meta content="black" name="apple-mobile-web-app-status-bar-style">
-    <meta content="telephone=no" name="format-detection" />
-    <link href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster"/>
-    <link rel="stylesheet" href="./css/page.css" />
+  <title>vansepak a plugin for text to speech</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,user-scalable=0,initial-scale=1,maximum-scale=1">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <meta content="telephone=no" name="format-detection" />
+  <link href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster" />
+  <link rel="stylesheet" href="./css/page.css" />
+  <link rel="icon" type="image/png" href="./images/vanspeak.logo.png" />
 </head>
 
 <body>
-    
-    <div class="doc">
-        <div class="doc-hd">
-            <h1>Vanspeak.JS</h1>
-            <p>A plugin For Text To Speech</p>
-            <p>
-                <a href="" class="btn btn-install"> 
+  
+  <div class="doc">
+    <nav class="navbar navbar-default navbar-fixed-top js-navbar">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">
+            <img alt="vanspeak" width="26" src="data:image/png;base64,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">
+          </a>
+          
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="#document">Docs<span class="sr-only">(current)</span></a></li>
+            <li><a href="#examples">Examples</a></li>
+            <li><a href="https://github.com/Vanthink-UED/vanspeak">Github</a></li>
+          </ul>
+      </div>
+    </nav>
+    <div class="doc-hd">
+      <h1>Vanspeak.JS</h1>
+      <p>A plugin For Text To Speech</p>
+      <p>
+        <a href="https://github.com/Vanthink-UED/vanspeak" class="btn btn-install"> 
                   Install Now 
                 </a>
-            </p>
-        </div>
-        <h2>How To Use It?</h2>
-        <div class="doc-main contents">
-            
-            <h3>快速开始</h3>
-            <pre><code>&lt;script src="./build/vanspeak.min.js"&gt;&lt;/script&gt;</code></pre>
-            <p>使用CDN地址</p>
-            <pre><code>&lt;script src="http://s1.vued.vanthink.cn/vanspeak.min.js"&gt;&lt;/script&gt;</code></pre>
-            <p>In your JS File</p>
-            <pre><code>vanSpeak.say('Hello wolrd');</code></pre>
-            
-            <a href="https://github.com/Vanthink-UED/vanspeak" class="btn btn-info">查看更多配置</a>
-            
-            
-            
-            
-            <p>如果您有兴趣，可以点击<a href="https://github.com/JackPu/text-to-speech">这里</a>了解更多</p>
-            
-            
-            <br/>
-            <!-- Go to www.addthis.com/dashboard to customize your tools -->
-            <div class="addthis_sharing_toolbox"></div>
-        </div>
-        <div class="doc-ft">
-            All Rights Reserved By Vanthink-UED
-        </div>
+      </p>
+    </div>
+    <h2 id="document">How To Use It?</h2>
+    <div class="doc-main contents">
+
+      <h3 >快速开始</h3>
+      <pre><code>&lt;script src="./build/vanspeak.min.js"&gt;&lt;/script&gt;</code></pre>
+      <p>使用CDN地址</p>
+      <pre><code>&lt;script src="http://s1.vued.vanthink.cn/vanspeak.min.js"&gt;&lt;/script&gt;</code></pre>
+      <p>In your JS File</p>
+      <pre><code>vanspeak.say('Hello wolrd');</code></pre>
+
+      
+
+
+
+
+      <p><a href="https://github.com/Vanthink-UED/vanspeak">查看更多配置</a> , 如果您有兴趣，可以点击<a href="https://github.com/JackPu/text-to-speech">这里</a>了解更多</p>
+
+
+      <br/>
+
+    </div>
+    <h2>Examples</h2>
+    <div class="doc-main contents">
+
+      <h3 id="examples">拼读一个单词</h3>
+      <pre><code>vanspeak.say('Hello wolrd');</code></pre>
+      <p class="form-group">
+        <button class="btn btn-primary js-speak" data-word="hello">Speak('Hello')</button>
+      </p>
+      <h3>拼读一个句子</h3>
+      <pre><code>vanspeak.say('Visit BBC News for up-to-the-minute news');</code></pre>
+      <p class="form-group">
+        <button class="btn btn-primary js-speak" data-word="Visit BBC News for up-to-the-minute news">Speak Now</button>
+      </p>
+      <h3>停止当前阅读</h3>
+      <pre><code>vanspeak.cancel();</code></pre>
+      <p class="form-group">
+        <button class="btn btn-primary js-speak" data-word="The Category 4 hurricane touched down on Haiti's southern shore on Tuesday, leaving hundreds dead in its wake and decimating the country's already fragile communications infrastructure. The damage to Haiti's southern peninsula is the latest setback in a series of environmental disasters that have gripped the country recently">Start</button>
+        <button class="btn btn-primary js-stop-speak">Stop</button>
+      </p>
+      
+      <br/>
+      <!-- Go to www.addthis.com/dashboard to customize your tools -->
+      <div class="addthis_sharing_toolbox"></div>
+    </div>
+    <div class="doc-ft">
+      All Rights Reserved By Vanthink-UED
+    </div>
+
+  </div>
+
+
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-55d88bec2ab91030" async="async"></script>
+
+  </div>
+
+  <script src="//cdn.jsdelivr.net/highlight.js/9.2.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <script src='http://s1.vued.vanthink.cn/d59f937c159f/jquery-2.2.1.min.js'></script>
+  <script src='../src/vanspeak.js'></script>
+  <script type="text/javascript">
+    var H = $('.doc-hd').height();
+    $(function() {
+      
+      $('.js-speak').on('click',function() {
+        var s = $(this).attr('data-word');
+        vanspeak.say(s);
+      });
+      $('.js-stop-speak').on('click',function() {
+        vanspeak.cancel();
+      });
+      
+      // scroll
+      $(window).on('scroll', function() {
+        var ch = $(this).scrollTop();
+        if(ch >= H && !$('.js-navbar').hasClass('active')) {
+          $('.js-navbar').addClass('active');  
+        }
+        if(ch < H ) {
+          $('.js-navbar').removeClass('active');
+        }
         
-    </div>
-
-
-    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-55d88bec2ab91030" async="async"></script>
-    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=55332900" charset="UTF-8"></script>
-    </div>
-
-    <script src="//cdn.jsdelivr.net/highlight.js/9.2.0/highlight.min.js"></script>
-    <script>
-        hljs.initHighlightingOnLoad();
-    </script>
-    <script src='http://s1.vued.vanthink.cn/d59f937c159f/jquery-2.2.1.min.js'></script>
-    <script src='../src/vanspeak.js'></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            //  $('.js-words').focus();
-            $('.js-speack-one').on('click', function () {
-                var words = new SpeechSynthesisUtterance('Hello captain');
-                window.speechSynthesis.speak(words);
-            });
-            $('.js-change-one').on('click', function () {
-                var msg = new SpeechSynthesisUtterance();
-                var voices = window.speechSynthesis.getVoices();
-                msg.voice = voices[10]; // 
-                msg.voiceURI = 'native';
-                msg.volume = 1; // 0 to 1
-                msg.rate = 1; // 0.1 to 10
-                msg.pitch = 2; //0 to 2
-                msg.text = 'I am Stark';
-                msg.lang = 'en';
-
-                msg.onend = function(e) {
-                  console.log('Finished in ' + event.elapsedTime + ' seconds.');
-                };
-
-                speechSynthesis.speak(msg);
-            });
-            $('.js-change-vocie').on('click', function () {
-                var msg = new SpeechSynthesisUtterance('hey captain,sometime I just want to break you perfect teeth');
-                msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == 'Google US English'; })[0];
-                speechSynthesis.speak(msg);
-            });
-            $('.js-speack-japanese').on('click', function () {
-                var msg = new SpeechSynthesisUtterance('おはようございます');
-                msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == 'Google 日本語'; })[0];
-                speechSynthesis.speak(msg);
-            });
-            $('.js-speack-chinese').on('click', function () {
-                var msg = new SpeechSynthesisUtterance('美国队长3');
-                msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == 'Google 普通话（中国大陆）'; })[0];
-                speechSynthesis.speak(msg);
-            });
-        })
-    </script>
+      })
+    })
+  </script>
 
 </body>
 

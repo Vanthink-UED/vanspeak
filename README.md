@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Vanthink-UED/vanspeak.svg?branch=master)](https://travis-ci.org/Vanthink-UED/vanspeak)
 
-a plugin for text to speech
+a plugin for text to speech (<=12KB)
 
 
 
