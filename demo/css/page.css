@@ -1,0 +1,165 @@
+*{
+    margin:0;
+    padding: 0;
+}
+
+body{
+    font-size: 16px;
+    font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, 'Microsoft Yahei', SimHei, arial, sans-serif;
+    background:#e3e3e3;
+}
+.page{
+    position: relative;
+    width: 100%;
+}
+img{
+    max-width: 100%;
+}
+a{
+    color: #1ba1e2;
+    text-decoration: none;
+    transition: all .2s ease;
+}
+h1{
+    text-align: center;
+    margin-top: 0;
+    padding-top: 120px;
+    padding-bottom: 40px;
+    font-family: 'Lobster';
+    font-size: 60px;
+    letter-spacing: 2px;
+    text-shadow: 0 6px 1px rgba(0,0,0,0.2);
+}
+
+h1 img{
+    width: 480px;
+    
+}
+h2{
+    color: #03a9f4;
+    padding-top: 60px;
+    padding-bottom: 30px;
+    text-align: center;
+}
+ul{
+    padding-left: 40px;
+}
+.doc-hd{
+    min-height: 75vh;
+    background: #2d323c url(http://img1.vued.vanthink.cn/vued0c36e3c9fb7a643dbbf6903607b214f0.png) center bottom;
+    color:#df2d70;
+    text-align: center;
+    
+}
+.doc-hd p {
+    font-size: 20px;
+    color: #888;
+    padding: 20px 0;
+}
+.btn-install{
+    padding: 12px 36px;
+    border-radius: 50px;
+    font-size: 18px;
+    color: #df2d70;
+    background: #2d323c;
+    border:2px solid #df2d70;
+}
+.btn-install:hover{
+    color:#fff;
+    border-color:#fff;;
+}
+.contents{
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 6px 10px rgba(0,0,0,.15);
+    max-width: 720px;
+    margin: 0 auto 40px auto;
+}
+
+.doc-ft{
+    padding-top: 40px;
+    padding-bottom: 30px;
+    background: #2d323c;
+    color:#555;
+    font-size: 13px;
+    text-align: center;
+}
+pre{
+    border-width: 0px;
+}
+@media all and (max-width:960px) {
+    h2,.doc,.img-wrap{
+        width:95%;
+        flex-wrap: wrap;
+    }
+    .img-wrap .item{
+        width: 100%'
+    }
+}
+/** view doc https://highlightjs.org **/
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: #f7f7f7;
+}
+.hljs,
+.hljs-subst {
+  color: #2c3e50;
+}
+.hljs-comment {
+  color: #999;
+}
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-meta-keyword,
+.hljs-doctag,
+.hljs-name {
+  font-weight: bold;
+}
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #e74c3c;
+}
+.hljs-title,
+.hljs-section {
+  color: #e74c3c;
+  font-weight: bold;
+}
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #bc6060;
+}
+.hljs-literal {
+  color: #78a960;
+}
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #16a085;
+}
+.hljs-meta {
+  color: #2980b9;
+}
+.hljs-meta-string {
+  color: #2980b9;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: bold;
+}
