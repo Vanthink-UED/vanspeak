@@ -564,8 +564,6 @@
             }, 50);
           }
 
-
-          ////console.log("not found");
           return false;
         }
       },
