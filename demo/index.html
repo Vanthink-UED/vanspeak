@@ -44,7 +44,7 @@
       </p>
     </div>
     <h2 id="document">How To Use It?</h2>
-    <div class="doc-main contents">
+    <div class="doc-main contents g-hidden">
 
       <h3 >快速开始</h3>
       <pre><code>&lt;script src="./build/vanspeak.min.js"&gt;&lt;/script&gt;</code></pre>
@@ -65,7 +65,7 @@
 
     </div>
     <h2>Examples</h2>
-    <div class="doc-main contents">
+    <div class="doc-main contents g-hidden">
 
       <h3 id="examples">拼读一个单词</h3>
       <pre><code>vanspeak.say('Hello wolrd');</code></pre>
@@ -87,6 +87,13 @@
       <br/>
       <!-- Go to www.addthis.com/dashboard to customize your tools -->
       <div class="addthis_sharing_toolbox"></div>
+    </div>
+    <div class="doc-main contents">
+      <h3 id="examples">拼读多个单词</h3>
+      <pre><code>vanspeak.say('Hello wolrd');</code></pre>
+      <p class="form-group">
+        <button class="btn btn-primary js-test-speak" data-word="hello">Speak</button>
+      </p>
     </div>
     <div class="doc-ft">
       All Rights Reserved By Vanthink-UED
@@ -116,7 +123,12 @@
       $('.js-stop-speak').on('click',function() {
         vanspeak.cancel();
       });
-      
+        
+      var testWords = ['devilishly','tricky','track','down','number','additional'];
+      var i = 0;
+      $('.js-test-speak').on('click',function() {
+        vanspeak.say(testWords[i++%6]);
+      });
       // scroll
       $(window).on('scroll', function() {
         var ch = $(this).scrollTop();

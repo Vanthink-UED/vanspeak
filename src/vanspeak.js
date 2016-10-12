@@ -12,7 +12,8 @@
     root.vanSpeak = root.vanspeak = root.Vanspeak = factory();
   }
 }(this, function () {
-  var vanspeak = (function () {
+    
+var vanspeak = (function () {
 
     var VOICES = {
       'us': [
@@ -135,7 +136,7 @@
               }
             } else {
               clearInterval(gsvinterval);
-              speakMode = 1;
+              speakMode = 2;
               selectRightVoice(voices);
             }
 
@@ -742,7 +743,9 @@
       },
 
       addPreLoadAudio: function (word, src) {
-
+        if (this.preloadAudioList == undefined) {
+          this.preloadAudioList = [];
+        } 
         this.preloadAudioList.push({
           key: word,
           src: src
@@ -875,5 +878,8 @@
 
 
   }());
+  // prevent audio not stop
+      
+    
   return vanspeak;
 }));;

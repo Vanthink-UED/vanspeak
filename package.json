@@ -1,6 +1,6 @@
 {
   "name": "vanspeak",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "a plugin for text to speech",
   "main": "index.js",
   "scripts": {
