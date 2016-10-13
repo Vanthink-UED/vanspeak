@@ -63,8 +63,48 @@ btn.onclick = function() {
 
 取消当前的发音
 
-### 初始化配置
++ setVolume 
+
+设置音量大小 @param v(0-1) 
 
 
 
+### 初始化配置 Options
+
+| key        | Type         | Example  | Description  |
+| ------------- |:----------| ---------|--------------|
+| rate     | Number | 0.7 | the speech speed |
+| volume      | Number      |  1 | speech volume |
+| maxWordNum | Number     |   120 | limte the word length |
+| speechStart | Function   |     | when speech start |
+| speechEnd | Function   |    | when speech end |
+| speechError | Function   |    | when speech error|
+
+
+example: 
+
+``` js
+var options = {
+  'rate': 0.7,
+  'volume': 1,
+  // max words num for better experence  so we limit max words 
+  'maxWordNum': 100,
+  'speechStart': function () {
+    console.log('start');
+  }
+}
+
+```
+
+ this.defaultOptions = {
+      'rate': 0.7,
+      'volume': 1,
+      // max words num for better experence  so we limit max words 
+      'maxWordNum': 100,
+      'speechStart': function () {},
+      'speechEnd': function () {},
+      'speechError': function () {
+        console.warn('Voice not workong!');
+      }
+    };
 

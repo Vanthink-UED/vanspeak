@@ -4,422 +4,421 @@
  * the first version some params was not supported beacuse we force users to accept US accent and the speed
  **/
 (function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-      define([], factory);
-    } else if (typeof module === "object" && module.exports) {
-      module.exports = factory();
+  if (typeof define === "function" && define.amd) {
+    define([], factory);
+  } else if (typeof module === "object" && module.exports) {
+    module.exports = factory();
+  } else {
+    root.vanSpeak = root.vanspeak = root.Vanspeak = factory();
+  }
+}(this, function () {
+  var mix = function (des, src, override) {
+    if (typeof override == 'function') {
+      for (var i in src) {
+        des[i] = override(des[i], src[i], i);
+      }
     } else {
-      root.vanSpeak = root.vanspeak = root.Vanspeak = factory();
+      for (i in src) {
+        if (override || !(des[i] || (i in des))) {
+          des[i] = src[i];
+        }
+      }
     }
-  }(this, function () {
 
+    return des;
+  };
 
-      var mix = function (des, src, override) {
-        if (typeof override == 'function') {
-          for (var i in src) {
-            des[i] = override(des[i], src[i], i);
-          }
-        } else {
-          for (i in src) {
-            if (override || !(des[i] || (i in des))) {
-              des[i] = src[i];
-            }
-          }
+  // simple xhr
+  var xhr = function (method, url, headers, data, callback) {
+
+    var r = new XMLHttpRequest();
+    var error = this.error;
+
+    // Binary?
+    var binary = false;
+    if (method === 'blob') {
+      binary = method;
+      method = 'GET';
+    }
+
+    method = method.toUpperCase();
+
+    // Xhr.responseType 'json' is not supported in any of the vendors yet.
+    r.onload = function (e) {
+      var json = r.response;
+      try {
+        json = JSON.parse(r.responseText);
+      } catch (_e) {
+        if (r.status === 401) {
+          json = console.error('access_denied', r.statusText);
         }
-
-        return des;
-      };
-
-      // simple xhr
-      var xhr = function (method, url, headers, data, callback) {
-
-        var r = new XMLHttpRequest();
-        var error = this.error;
-
-        // Binary?
-        var binary = false;
-        if (method === 'blob') {
-          binary = method;
-          method = 'GET';
-        }
-
-        method = method.toUpperCase();
-
-        // Xhr.responseType 'json' is not supported in any of the vendors yet.
-        r.onload = function (e) {
-          var json = r.response;
-          try {
-            json = JSON.parse(r.responseText);
-          } catch (_e) {
-            if (r.status === 401) {
-              json = console.error('access_denied', r.statusText);
-            }
-          }
-
-          var headers = headersToJSON(r.getAllResponseHeaders());
-          headers.statusCode = r.status;
-          callback = callback || function () {};
-          callback(json || (method === 'GET' ? error('empty_response', 'Could not get resource') : {}), headers);
-        };
-
-        r.onerror = function (e) {
-          var json = r.responseText;
-          try {
-            json = JSON.parse(r.responseText);
-          } catch (_e) {}
-
-          callback && callback(json || console.error('access_denied', 'Could not get resource'));
-        };
-
-        var x;
-
-        // Should we add the query to the URL?
-        if (method === 'GET' || method === 'DELETE') {
-          data = null;
-        } else if (data && typeof (data) !== 'string' && !(data instanceof FormData) && !(data instanceof File) && !(data instanceof Blob)) {
-          // Loop through and add formData
-          var f = new FormData();
-          for (x in data)
-            if (data.hasOwnProperty(x)) {
-              if (data[x] instanceof HTMLInputElement) {
-                if ('files' in data[x] && data[x].files.length > 0) {
-                  f.append(x, data[x].files[0]);
-                }
-              } else if (data[x] instanceof Blob) {
-                f.append(x, data[x], data.name);
-              } else {
-                f.append(x, data[x]);
-              }
-            }
-
-          data = f;
-        }
-
-        // Open the path, async
-        r.open(method, url, true);
-
-        if (binary) {
-          if ('responseType' in r) {
-            r.responseType = binary;
-          } else {
-            r.overrideMimeType('text/plain; charset=x-user-defined');
-          }
-        }
-
-        // Set any bespoke headers
-        if (headers) {
-          for (x in headers) {
-            r.setRequestHeader(x, headers[x]);
-          }
-        }
-
-        r.send(data);
-
-        return r;
-
-        // Headers are returned as a string
-        function headersToJSON(s) {
-          var r = {};
-          var reg = /([a-z\-]+):\s?(.*);?/gi;
-          var m;
-          while ((m = reg.exec(s))) {
-            r[m[1]] = m[2];
-          }
-          return r;
-        }
-      };
-
-      var ua = window.navigator.userAgent.toLowerCase();
-      var UA = {
-        isAndroid: function () {
-          return ua.indexOf('android') > -1;
-        },
-        isIOS: function () {
-          return /(iPad|iPhone|iPod)/gi.test(ua);
-        },
-        isIOS9: function () {
-          return /(iphone|ipod|ipad).* os 9_/.test(ua);
-        },
-        isChrome: function () {
-          return ua.indexOf('chrome') > -1;
-        },
-        isSafari: function () {
-          return ua.indexOf('safari') > -1 && !isChrome();
-        },
-
-
-      };
-
-      // 文本分析
-      var SpeechText = {
-        // check the word is the normal word we are not supporting sentences Cache
-        isWord: function (word, maxWordNum) {
-          var max = maxWordNum ? parseInt(maxWordNum / 2) || 60;
-          if (word.length > max) {
-            return false;
-          }
-          if (/[a-zA-Z\d\._\-\']/.test(word)) {
-            return true;
-          }
-          return false;
-        },
-
-        /** if your sentence is so long we need divid those words into groups 
-         * EG : 'hello this.... end' => ['hello ...','...','end']
-         **/
-        groupWords: function (words, maxWordNum) {
-          var max = maxWordNum || 100;
-          var wordsGroup = [];
-          if (words.length > max) {
-            var tmptxt = words;
-
-            while (tmptxt.length > max) {
-              //Split by common phrase delimiters
-              var p = tmptxt.search(/[:!?.;。！；]+/);
-              var part = '';
-              //Coludn't split by priority characters, try commas
-              if (p == -1 || p >= max) {
-                p = tmptxt.search(/[,]+/);
-              }
-
-              //Check for spaces. If no spaces then split by 99 characters.
-              if (p == -1) {
-
-                if (tmptxt.search(' ') == -1)
-                  p = 99;
-              }
-
-              //Couldn't split by normal characters, then we use spaces
-              if (p == -1 || p >= max) {
-                var words = tmptxt.split(' ');
-                for (var i = 0; i < words.length; i++) {
-                  if (part.length + words[i].length + 1 > max)
-                    break;
-                  part += (i != 0 ? ' ' : '') + words[i];
-
-                }
-
-              } else {
-                part = tmptxt.substr(0, p + 1);
-              }
-
-              tmptxt = tmptxt.substr(part.length, tmptxt.length - part.length);
-              wordsGroup.push(part);
-            }
-            //Add the remaining text
-            if (tmptxt.length > 0) {
-              wordsGroup.push(tmptxt);
-            }
-            return wordsGroup;
-          } else {
-            return [words];
-          }
-
-        },
-
-        getSpeechTime: function (speed, words) {
-          // this is a normal speed 
-          var WORDS_PER_MINUTE = 130,
-            var multiplier = speed;
-          if (voice.timerSpeed === null) {
-            multiplier = 1;
-          }
-          if (multiplier <= 0) {
-            return;
-          }
-          var realwords = words.split(/\s+/).length;
-          var chars = (words.match(/[^ ]/igm) || words).length;
-          //word length factor: 5.1 is the average word length in english.
-          var wlf = (chars / realwords) / 5.1;
-          //avg 140 words per minute speech time
-          var length = multiplier * 1000 * (60 / WORDS_PER_MINUTE) * wlf * realwords;
-          if (words < 3) {
-            length = 4000;
-          }
-          if (length < 3000) {
-            length = 3000;
-          }
-          return length;
-
-        },
-
-
-      };
-
-
-      // TTS class
-      function TTS(voices, options) {
-
-        // we only provide english 
-        var VOICES = {
-          'us': [
-            {
-              name: 'Google US English',
-              default: false,
-              voiceURI: "Google US English",
-              lang: "en-US",
-              localService: false
-          },
-            {
-              name: 'English United States',
-              lang: 'en_US'
-          },
-            {
-              name: 'en-US',
-              rate: 0.2,
-              pitch: 1,
-              timerSpeed: 1.3
-          },
-            {
-              name: 'Samantha',
-              voiceURI: 'com.apple.speech.synthesis.voice.Samantha'
-          }
-      ],
-          'uk': [
-            {
-              name: 'Google UK English Feale',
-              flag: 'gb',
-              gender: 'f'
-          }
-      ]
-        };
-        var iosCacheVoice = {
-          "name": "en-US",
-          "voiceURI": "en-US",
-          "lang": "en-US"
-        };
-        var ios9CacheVoice = {
-          name: "Samantha",
-          voiceURI: "com.apple.ttsbundle.Samantha-premium",
-          lang: "en-US",
-          localService: !0,
-          "default": !0
-        };
-
-        this.defaultOptions = {
-          'rate': 0.7,
-          'volume': 1,
-          // max words num for better experence  so we limit max words 
-          'maxWordNum': 100,
-          'speechStart': function () {},
-          'speechEnd': function () {},
-          'speechError': function () {
-            console.warn('Voice not workong!');
-          }
-        };
-
-        this.iosVoiceInit === false;
-        this.utterances = [];
-        // find the right voice name for speech 
-        if (UA.isChrome()) {
-          speakVoice = VOICES['us'][0];
-        }
-        if (UA.isSafari()) {
-          speakVoice = VOICES['us'][3];
-        }
-        if (UA.isAndroid()) {
-          speakVoice = VOICES['us'][1]
-        }
-        if (UA.isIOS()) {
-          speakVoice = iosCacheVoice;
-        }
-
-        if (UA.isIOS9()) {
-          speakVoice = ios9CacheVoice;
-          this.voice = speakVoice;
-          return;
-        }
-
-        function getSystemVoice(name, voices, lang) {
-          for (var i = 0; i < allVoice.length; i++) {
-            if (allVoice[i].name == name) {
-              return allVoice[i];
-            }
-
-            // for some device we should  find the right language
-          }
-          for (var i = 0; i < allVoice.length; i++) {
-            if (allVoice[i].lang == lang) {
-              return allVoice[i];
-            }
-          }
-          return false;
-        }
-
-        this.voice = getSystemVoice(speakVoice['name'], allVoice, speakVoice['lang']);
-
-
-
-
       }
 
+      var headers = headersToJSON(r.getAllResponseHeaders());
+      headers.statusCode = r.status;
+      callback = callback || function () {};
+      callback(json || (method === 'GET' ? error('empty_response', 'Could not get resource') : {}), headers);
+    };
 
-      TTS.prototype = {
+    r.onerror = function (e) {
+      var json = r.responseText;
+      try {
+        json = JSON.parse(r.responseText);
+      } catch (_e) {}
 
-        say: function (word, options) {
-          this.options = mix(this.defaultOptions, options);
-          if (this.isPlaying()) {
-            this.cancel();
-          }
-          if (UA.isIOS9() && this.iosVoiceInit === false) {
-            setTimeout(function () {
-              self.say(words, params);
-            }, 100);
-            self.startHandle();
-          }
-          var self = this;
-          this.wordsGroup = SpeechText.groupWords(words);
-          for (var i = 0; i < this.wordsGroup.length; i++) {
-            // use speech api SpeechSynthesis
-            var word = self.wordsGroup[i];
-            var msg = new SpeechSynthesisUtterance();
-            if (this.voice.voiceURI) {
-              msg.voice = this.voice.;
-              msg.voiceURI = this.voice.voiceURI;
-            }
-            // we need loudly volume
-            msg.volume = 1;
-            if (isIOS()) {
-              msg.rate = (this.options.rate != null ? (this.options.rate * this.options.rate) : 1) * msg.rate;
-            } else {
-              msg.rate = (this.options.rate != null ? this.options.rate : 1) * msg.rate;
-            }
-            msg.pitch = self.selectBest([this.options.pitch, 1]);
-            msg.text = this.wordsGroup[i];
-            msg.lang = this.voice.lang;
-            msg.rvIndex = i;
-            msg.rvTotal = this.wordsGroup.length;
-            if (i == 0) {
-              msg.onstart = self.options.speechStart;
-            }
-            this.options.onendcalled = false;
-            this.options.words = msg.text;
-            if (i < this.wordsGroup.length - 1 && this.wordsGroup.length > 1) {
-              msg.onend = this.onPartEnd;
-              if (msg.hasOwnProperty("addEventListener"))
-                msg.addEventListener('end', this.onPartEnd);
+      callback && callback(json || console.error('access_denied', 'Could not get resource'));
+    };
 
-            } else {
-              msg.onend = self.speechEnd;
-              if (msg.hasOwnProperty("addEventListener"))
-                msg.addEventListener('end', this.speech_onend);
-            }
-            msg.onerror = this.options.speechError;
-            // TODO 
-            //  msg.onpause = this.options.onpause;
-            //  msg.onresume = this.options.onresume;
-            //  msg.onmark = this.options.onmark;
-            msg.onboundary = this.options.onboundary || self.onboundary.bind(self);
-            // msg.pitch = this.options.pitch || msg.pitch;
-            msg.volume = this.options.volume || msg.volume;
-          }
+    var x;
 
-          this.utterances.push(msg);
-          if (i == 0) {
-            this.currentMsg = msg;
+    // Should we add the query to the URL?
+    if (method === 'GET' || method === 'DELETE') {
+      data = null;
+    } else if (data && typeof (data) !== 'string' && !(data instanceof FormData) && !(data instanceof File) && !(data instanceof Blob)) {
+      // Loop through and add formData
+      var f = new FormData();
+      for (x in data)
+        if (data.hasOwnProperty(x)) {
+          if (data[x] instanceof HTMLInputElement) {
+            if ('files' in data[x] && data[x].files.length > 0) {
+              f.append(x, data[x].files[0]);
+            }
+          } else if (data[x] instanceof Blob) {
+            f.append(x, data[x], data.name);
+          } else {
+            f.append(x, data[x]);
           }
-          this.runTTS(msg);
         }
+
+      data = f;
+    }
+
+    // Open the path, async
+    r.open(method, url, true);
+
+    if (binary) {
+      if ('responseType' in r) {
+        r.responseType = binary;
+      } else {
+        r.overrideMimeType('text/plain; charset=x-user-defined');
+      }
+    }
+
+    // Set any bespoke headers
+    if (headers) {
+      for (x in headers) {
+        r.setRequestHeader(x, headers[x]);
+      }
+    }
+
+    r.send(data);
+
+    return r;
+
+    // Headers are returned as a string
+    function headersToJSON(s) {
+      var r = {};
+      var reg = /([a-z\-]+):\s?(.*);?/gi;
+      var m;
+      while ((m = reg.exec(s))) {
+        r[m[1]] = m[2];
+      }
+      return r;
+    }
+  };
+
+  var ua = window.navigator.userAgent.toLowerCase();
+  var UA = {
+    isAndroid: function () {
+      return ua.indexOf('android') > -1;
+    },
+    isIOS: function () {
+      return /(iPad|iPhone|iPod)/gi.test(ua);
+    },
+    isIOS9: function () {
+      return /(iphone|ipod|ipad).* os 9_/.test(ua);
+    },
+    isChrome: function () {
+      return ua.indexOf('chrome') > -1;
+    },
+    isSafari: function () {
+      return ua.indexOf('safari') > -1 && ! (ua.indexOf('chrome') > -1);
+    },
+
+
+  };
+
+  // 文本分析
+  var SpeechText = {
+    // check the word is the normal word we are not supporting sentences Cache
+    isWord: function (word, maxWordNum) {
+      var maxWordNum = maxWordNum || 120;
+      var max = maxWordNum / 2;
+      if (word.length > max) {
+        return false;
+      }
+      if (/[a-zA-Z\d\._\-\']/.test(word)) {
+        return true;
+      }
+      return false;
+    },
+
+    /** if your sentence is so long we need divid those words into groups 
+     * EG : 'hello this.... end' => ['hello ...','...','end']
+     **/
+    groupWords: function (words, maxWordNum) {
+      var max = maxWordNum || 100;
+      var wordsGroup = [];
+      if (words.length > max) {
+        var tmptxt = words;
+
+        while (tmptxt.length > max) {
+          //Split by common phrase delimiters
+          var p = tmptxt.search(/[:!?.;。！；]+/);
+          var part = '';
+          //Coludn't split by priority characters, try commas
+          if (p == -1 || p >= max) {
+            p = tmptxt.search(/[,]+/);
+          }
+
+          //Check for spaces. If no spaces then split by 99 characters.
+          if (p == -1) {
+
+            if (tmptxt.search(' ') == -1)
+              p = 99;
+          }
+
+          //Couldn't split by normal characters, then we use spaces
+          if (p == -1 || p >= max) {
+            var words = tmptxt.split(' ');
+            for (var i = 0; i < words.length; i++) {
+              if (part.length + words[i].length + 1 > max)
+                break;
+              part += (i != 0 ? ' ' : '') + words[i];
+
+            }
+
+          } else {
+            part = tmptxt.substr(0, p + 1);
+          }
+
+          tmptxt = tmptxt.substr(part.length, tmptxt.length - part.length);
+          wordsGroup.push(part);
+        }
+        //Add the remaining text
+        if (tmptxt.length > 0) {
+          wordsGroup.push(tmptxt);
+        }
+        return wordsGroup;
+      } else {
+        return [words];
+      }
+
+    },
+
+    getSpeechTime: function (speed, words) {
+      // this is a normal speed 
+      var WORDS_PER_MINUTE = 130;
+      var multiplier = speed;
+      if (voice.timerSpeed === null) {
+        multiplier = 1;
+      }
+      if (multiplier <= 0) {
+        return;
+      }
+      var realwords = words.split(/\s+/).length;
+      var chars = (words.match(/[^ ]/igm) || words).length;
+      //word length factor: 5.1 is the average word length in english.
+      var wlf = (chars / realwords) / 5.1;
+      //avg 140 words per minute speech time
+      var length = multiplier * 1000 * (60 / WORDS_PER_MINUTE) * wlf * realwords;
+      if (words < 3) {
+        length = 4000;
+      }
+      if (length < 3000) {
+        length = 3000;
+      }
+      return length;
+
+    },
+
+
+  };
+
+
+  // TTS class
+  function TTS(voices, options) {
+
+    // we only provide english 
+    var VOICES = {
+      'us': [
+        {
+          name: 'Google US English',
+          default: false,
+          voiceURI: "Google US English",
+          lang: "en-US",
+          localService: false
+          },
+        {
+          name: 'English United States',
+          lang: 'en_US'
+          },
+        {
+          name: 'en-US',
+          rate: 0.2,
+          pitch: 1,
+          timerSpeed: 1.3
+          },
+        {
+          name: 'Samantha',
+          voiceURI: 'com.apple.speech.synthesis.voice.Samantha'
+          }
+      ],
+      'uk': [
+        {
+          name: 'Google UK English Feale',
+          flag: 'gb',
+          gender: 'f'
+          }
+      ]
+    };
+    var iosCacheVoice = {
+      "name": "en-US",
+      "voiceURI": "en-US",
+      "lang": "en-US"
+    };
+    var ios9CacheVoice = {
+      name: "Samantha",
+      voiceURI: "com.apple.ttsbundle.Samantha-premium",
+      lang: "en-US",
+      localService: !0,
+      "default": !0
+    };
+
+    this.defaultOptions = {
+      'rate': 0.7,
+      'volume': 1,
+      // max words num for better experence  so we limit max words 
+      'maxWordNum': 100,
+      'speechStart': function () {},
+      'speechEnd': function () {},
+      'speechError': function () {
+        console.warn('Voice not workong!');
+      }
+    };
+
+    this.iosVoiceInit === false;
+    this.utterances = [];
+    // find the right voice name for speech 
+    if (UA.isChrome()) {
+      speakVoice = VOICES['us'][0];
+    }
+    if (UA.isSafari()) {
+      speakVoice = VOICES['us'][3];
+    }
+    if (UA.isAndroid()) {
+      speakVoice = VOICES['us'][1]
+    }
+    if (UA.isIOS()) {
+      speakVoice = iosCacheVoice;
+    }
+
+    if (UA.isIOS9()) {
+      speakVoice = ios9CacheVoice;
+      this.voice = speakVoice;
+      return;
+    }
+
+    function getSystemVoice(name, voices, lang) {
+      for (var i = 0; i < voices.length; i++) {
+        if (voices[i].name == name) {
+          return voices[i];
+        }
+
+        // for some device we should  find the right language
+      }
+      for (var i = 0; i < voices.length; i++) {
+        if (voices[i].lang == lang) {
+          return voices[i];
+        }
+      }
+      return false;
+    }
+    
+    this.voice = getSystemVoice(speakVoice['name'], voices, speakVoice['lang']);
+
+
+
+
+  }
+
+
+  TTS.prototype = {
+
+    say: function (words, options) {
+      this.options = mix(this.defaultOptions, options);
+      if (this.isPlaying()) {
+        this.cancel();
+      }
+      if (UA.isIOS9() && this.iosVoiceInit === false) {
+        setTimeout(function () {
+          self.say(words, params);
+        }, 100);
+        self.startHandle();
+      }
+      var self = this;
+      this.wordsGroup = SpeechText.groupWords(words);
+      for (var i = 0; i < this.wordsGroup.length; i++) {
+        // use speech api SpeechSynthesis
+        var word = self.wordsGroup[i];
+        var msg = new SpeechSynthesisUtterance();
+        if (this.voice.voiceURI) {
+          msg.voice = this.voice;
+          msg.voiceURI = this.voice.voiceURI;
+        }
+        // we need loudly volume
+        msg.volume = 1;
+        if (UA.isIOS()) {
+          msg.rate = (this.options.rate != null ? (this.options.rate * this.options.rate) : 1) * msg.rate;
+        } else {
+          msg.rate = (this.options.rate != null ? this.options.rate : 1) * msg.rate;
+        }
+        msg.pitch = self.selectBest([this.options.pitch, 1]);
+        msg.text = this.wordsGroup[i];
+        msg.lang = this.voice.lang;
+        msg.rvIndex = i;
+        msg.rvTotal = this.wordsGroup.length;
+        if (i == 0) {
+          msg.onstart = self.options.speechStart;
+        }
+        this.options.onendcalled = false;
+        this.options.words = msg.text;
+        if (i < this.wordsGroup.length - 1 && this.wordsGroup.length > 1) {
+          msg.onend = this.onPartEnd;
+          if (msg.hasOwnProperty("addEventListener"))
+            msg.addEventListener('end', this.onPartEnd);
+
+        } else {
+          msg.onend = self.speechEnd;
+          if (msg.hasOwnProperty("addEventListener")) {
+            msg.addEventListener('end', this.speech_onend);
+          }
+          msg.onerror = this.options.speechError;
+          // TODO 
+          //  msg.onpause = this.options.onpause;
+          //  msg.onresume = this.options.onresume;
+          //  msg.onmark = this.options.onmark;
+          msg.onboundary = this.options.onboundary || self.onboundary.bind(self);
+          // msg.pitch = this.options.pitch || msg.pitch;
+          msg.volume = this.options.volume || msg.volume;
+
+        }
+
+        this.utterances.push(msg);
+        if (i == 0) {
+          this.currentMsg = msg;
+        }
+        this.runTTS(msg);
       }
 
     },
@@ -459,15 +458,13 @@
 
     },
 
-
-
     isPlaying: function () {
       return this.speechSynthesis && this.speechSynthesis.speaking;
     },
 
     speechEnd: function () {
       this.options.speechEnd();
-    }
+    },
 
     startTimeout: function (words, callback) {
       var time = SpeechText.getSpeechTime(this.voice.speed, words);
@@ -516,8 +513,6 @@
       }
 
     },
-
-
 
     onboundary: function (e) {
       var self = this;
@@ -595,23 +590,35 @@
 
   // 使用音频的发音  
   function AudioTTS() {
-    this.apis = {
-      "single": "http://api.vanthink.cn/api/audio/index?t=",
-      "multi": "http://api.vanthink.cn/api/audio/multi?t=",
-      "sentence": "http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=",
-    };
-    this.audioList = [];
-    // the audio has finished list
-    this.audioPlayedList = [];
-  }
-  // keep the same api whidth TTS  
+      this.apis = {
+        "single": "http://api.vanthink.cn/api/audio/index?t=",
+        "multi": "http://api.vanthink.cn/api/audio/multi?t=",
+        "sentence": "http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=",
+      };
+      this.audioList = [];
+      // the audio has finished list
+      this.audioPlayedList = [];
+      // preload audio list
+      this.preloadAudioList = [];
+      this.defaultOptions = {
+        'rate': 0.7,
+        'volume': 1,
+        // max words num for better experence  so we limit max words 
+        'maxWordNum': 100,
+        'speechStart': function () {},
+        'speechEnd': function () {},
+        'speechError': function () {
+          console.warn('Voice not workong!');
+        }
+      };
+    }
+    // keep the same api whidth TTS  
   AudioTTS.prototype = {
-    say: function (word, options) {
+    say: function (words, options) {
       this.options = mix(this.defaultOptions, options);
       if (this.isPlaying()) {
         this.cancel();
       }
-
       if (this.audioList.length > 0) {
         this.clearAudio();
       }
@@ -641,7 +648,7 @@
             var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(this.wordsGroup[i]);
             self.createAudio(word, url);
           } else {
-            this.getAudio('single',words,function (res) {
+            this.getAudio('single', words, function (res) {
               if (res.errcode == 0) {
                 src = res.data;
                 self.createAudio(word, src);
@@ -650,7 +657,6 @@
 
           }
         }
-
       }
 
     },
@@ -706,7 +712,6 @@
 
     isPlaying: function () {
       return (this.currentAudio != null && !this.currentAudio.ended && !this.currentAudio.paused);
-
     },
 
 
@@ -763,8 +768,6 @@
       this.currentAudio.addEventListener('ended', this.audioPlayFinish.bind(this));
     },
 
-
-
     audioPlayFinish: function (e) {
       this.checkAndCancelTimeout();
       if (this.audioTrackIndex <= this.audioList.length - 1) {
@@ -774,16 +777,11 @@
 
     },
 
-
-
     getAudio: function (type, q, callback, isCache) {
       var url = this.apis[type] + encodeURIComponent(q) + '&_req=' + (isCache ? '' : (new Date()).getTime() + '.' + Math.floor(Math.random() * 10000));
       xhr('GET', url, {}, {}, callback);
 
-    },
-
-
-
+    }
 
   };
 
@@ -792,26 +790,26 @@
 
   if (typeof (window.speechSynthesis) != 'undefined') {
     var voiceFindTry = 0;
+    var voices = window.speechSynthesis.getVoices();
+    vanspeak = new TTS(voices);
     setTimeout(function () {
       var gsvinterval = setInterval(function () {
         // get all voice supported
-        var voices = window.speechSynthesis.getVoices();
-
+        voices = window.speechSynthesis.getVoices();
         if (voices.length == 0) {
-
           voiceFindTry++;
           if (voiceFindTry > 20) {
             clearInterval(gsvinterval);
             //On IOS, sometimes getVoices is just empty, but speech works. So we use a cached voice collection.
             if (window.speechSynthesis != null) {
               if (UA.isIOS()) {
-                vanspeak = new AudioTTS(voices);
+                vanspeak = new TTS(voices);
               }
             }
           }
         } else {
           clearInterval(gsvinterval);
-          vanspeak = new AudioTTS();
+          vanspeak = new TTS(voices);
           if (!vanspeak.voice) {
             vanspeak = ats;
           }
@@ -822,14 +820,12 @@
   } else {
     vanspeak = ats;
   }
-
-
   // prevent audio not stop   
   window.onbeforeunload = function () {
     try {
       vanspeak.cancel();
     } catch (ew) {
-
+      console.log('page closed');
     }
   }
   return vanspeak;
