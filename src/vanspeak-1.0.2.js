@@ -245,7 +245,6 @@
 
   };
 
-
   // TTS class
   function TTS(voices, options) {
     // we only provide english 
@@ -265,11 +264,6 @@
 
     this.iosVoiceInit === false;
     this.utterances = [];
-    // find the right voice name for speech 
-    
-
-
-
 
   }
 
@@ -301,13 +295,6 @@
             voiceURI: 'com.apple.speech.synthesis.voice.Samantha'
             }
         ],
-        'uk': [
-          {
-            name: 'Google UK English Feale',
-            flag: 'gb',
-            gender: 'f'
-            }
-        ]
       };
       var iosCacheVoice = {
         "name": "en-US",
@@ -468,9 +455,7 @@
       }
     },
 
-    preAudio: function () {
-
-    },
+    preAudio: function () {},
 
     isPlaying: function () {
       return speechSynthesis && speechSynthesis.speaking;
@@ -566,18 +551,13 @@
         if (self.hasOwnProperty(timeoutName)) {
 
         } else {
-          //console.log("Setting up timeout for " + name);
           self[timeoutCount] = 10;
           self[timeoutName] = setInterval(function () {
-            ////console.log("Timeout function for " + name)
             self[timeoutCount] = self[timeoutCount] - 1;
 
             if (self.dispatch(name) || self[timeoutCount] < 0) {
               clearTimeout(self[timeoutName]);
-              //if (self[timeoutCount]<0) //console.log("Timeout ran out");
-            } else {
-              ////console.log("Keep waiting..." + name);
-            }
+            } 
           }, 50);
         }
 
@@ -586,16 +566,12 @@
     },
 
 
-
     checkAndCancelTimeout: function () {
       if (this.timeoutId != null) {
         clearTimeout(this.timeoutId);
         this.timeoutId = null;
       }
     },
-
-
-
 
 
   };
