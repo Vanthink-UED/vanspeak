@@ -94,17 +94,7 @@ var options = {
   }
 }
 
-```
+vanspeak.say('hello',options);
 
- this.defaultOptions = {
-      'rate': 0.7,
-      'volume': 1,
-      // max words num for better experence  so we limit max words 
-      'maxWordNum': 100,
-      'speechStart': function () {},
-      'speechEnd': function () {},
-      'speechError': function () {
-        console.warn('Voice not workong!');
-      }
-    };
+```
 
