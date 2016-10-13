@@ -881,5 +881,5 @@ var vanspeak = (function () {
   // prevent audio not stop
       
     
-  return vanspeak;
+  return window.vanspeak = window.vamSpeak = vanspeak;
 }));;

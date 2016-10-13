@@ -94,6 +94,15 @@
       <p class="form-group">
         <button class="btn btn-primary js-test-speak" data-word="hello">Speak</button>
       </p>
+      <h3 id="examples">拼读多个句子</h3>
+      <pre><code>var testSetences = [
+        'I by the canyon for about half an hour, and I asked myself. "Is the Grand Canyon the greatest wonder of the natural world?',
+        'I got out of the car, a gate and walked along a dark path',
+        'I remained the canyon for about half an hour, and I asked myself. "Is the Grand Canyon the greatest wonder of the natural world?',
+      ];</code></pre>
+      <p class="form-group">
+        <button class="btn btn-primary js-test-speak-sentence" data-word="hello">Speak</button>
+      </p>
     </div>
     <div class="doc-ft">
       All Rights Reserved By Vanthink-UED
@@ -125,9 +134,17 @@
       });
         
       var testWords = ['devilishly','tricky','track','down','number','additional'];
+      var testSetences = [
+        'I by the canyon for about half an hour, and I asked myself. "Is the Grand Canyon the greatest wonder of the natural world?',
+        'I got out of the car, a gate and walked along a dark path',
+        'I remained the canyon for about half an hour, and I asked myself. "Is the Grand Canyon the greatest wonder of the natural world?',
+      ];
       var i = 0;
       $('.js-test-speak').on('click',function() {
         vanspeak.say(testWords[i++%6]);
+      });
+      $('.js-test-speak-sentence').on('click',function() {
+        vanspeak.say(testSetences[i++%3]);
       });
       // scroll
       $(window).on('scroll', function() {

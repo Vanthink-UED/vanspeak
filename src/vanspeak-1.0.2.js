@@ -157,7 +157,7 @@
       if (word.length > max) {
         return false;
       }
-      if (/[a-zA-Z\d\._\-\']/.test(word)) {
+      if (/^[a-zA-Z\d\._\-\']+$/.test(word)) {
         return true;
       }
       return false;
@@ -248,52 +248,8 @@
 
   // TTS class
   function TTS(voices, options) {
-
     // we only provide english 
-    var VOICES = {
-      'us': [
-        {
-          name: 'Google US English',
-          default: false,
-          voiceURI: "Google US English",
-          lang: "en-US",
-          localService: false
-          },
-        {
-          name: 'English United States',
-          lang: 'en_US'
-          },
-        {
-          name: 'en-US',
-          rate: 0.2,
-          pitch: 1,
-          timerSpeed: 1.3
-          },
-        {
-          name: 'Samantha',
-          voiceURI: 'com.apple.speech.synthesis.voice.Samantha'
-          }
-      ],
-      'uk': [
-        {
-          name: 'Google UK English Feale',
-          flag: 'gb',
-          gender: 'f'
-          }
-      ]
-    };
-    var iosCacheVoice = {
-      "name": "en-US",
-      "voiceURI": "en-US",
-      "lang": "en-US"
-    };
-    var ios9CacheVoice = {
-      name: "Samantha",
-      voiceURI: "com.apple.ttsbundle.Samantha-premium",
-      lang: "en-US",
-      localService: !0,
-      "default": !0
-    };
+    
 
     this.defaultOptions = {
       'rate': 0.7,
@@ -303,49 +259,14 @@
       'speechStart': function () {},
       'speechEnd': function () {},
       'speechError': function () {
-        console.warn('Voice not workong!');
+        console.warn('Voice not working!');
       }
     };
 
     this.iosVoiceInit === false;
     this.utterances = [];
     // find the right voice name for speech 
-    if (UA.isChrome()) {
-      speakVoice = VOICES['us'][0];
-    }
-    if (UA.isSafari()) {
-      speakVoice = VOICES['us'][3];
-    }
-    if (UA.isAndroid()) {
-      speakVoice = VOICES['us'][1]
-    }
-    if (UA.isIOS()) {
-      speakVoice = iosCacheVoice;
-    }
-
-    if (UA.isIOS9()) {
-      speakVoice = ios9CacheVoice;
-      this.voice = speakVoice;
-      return;
-    }
-
-    function getSystemVoice(name, voices, lang) {
-      for (var i = 0; i < voices.length; i++) {
-        if (voices[i].name == name) {
-          return voices[i];
-        }
-
-        // for some device we should  find the right language
-      }
-      for (var i = 0; i < voices.length; i++) {
-        if (voices[i].lang == lang) {
-          return voices[i];
-        }
-      }
-      return false;
-    }
     
-    this.voice = getSystemVoice(speakVoice['name'], voices, speakVoice['lang']);
 
 
 
@@ -354,6 +275,90 @@
 
 
   TTS.prototype = {
+    
+    setVoices: function(voices) {
+      var VOICES = {
+        'us': [
+          {
+            name: 'Google US English',
+            default: false,
+            voiceURI: "Google US English",
+            lang: "en-US",
+            localService: false
+            },
+          {
+            name: 'English United States',
+            lang: 'en_US'
+            },
+          {
+            name: 'en-US',
+            rate: 0.2,
+            pitch: 1,
+            timerSpeed: 1.3
+            },
+          {
+            name: 'Samantha',
+            voiceURI: 'com.apple.speech.synthesis.voice.Samantha'
+            }
+        ],
+        'uk': [
+          {
+            name: 'Google UK English Feale',
+            flag: 'gb',
+            gender: 'f'
+            }
+        ]
+      };
+      var iosCacheVoice = {
+        "name": "en-US",
+        "voiceURI": "en-US",
+        "lang": "en-US"
+      };
+      var ios9CacheVoice = {
+        name: "Samantha",
+        voiceURI: "com.apple.ttsbundle.Samantha-premium",
+        lang: "en-US",
+        localService: !0,
+        "default": !0
+      };
+      var speakVoice = null;
+      if (UA.isChrome()) {
+        speakVoice = VOICES['us'][0];
+      }
+      if (UA.isSafari()) {
+        speakVoice = VOICES['us'][3];
+      }
+      if (UA.isAndroid()) {
+        speakVoice = VOICES['us'][1]
+      }
+      if (UA.isIOS()) {
+        speakVoice = iosCacheVoice;
+      }
+
+      if (UA.isIOS9()) {
+        speakVoice = ios9CacheVoice;
+        this.voice = speakVoice;
+        return;
+      }
+
+      function getSystemVoice(name, voices, lang) {
+        for (var i = 0; i < voices.length; i++) {
+          if (voices[i].name == name) {
+            return voices[i];
+          }
+
+          // for some device we should  find the right language
+        }
+        for (var i = 0; i < voices.length; i++) {
+          if (voices[i].lang == lang) {
+            return voices[i];
+          }
+        }
+        return this.voice = false;
+      }
+
+      this.voice = getSystemVoice(speakVoice['name'], voices, speakVoice['lang']);
+    },
 
     say: function (words, options) {
       this.options = mix(this.defaultOptions, options);
@@ -366,12 +371,17 @@
         }, 100);
         self.startHandle();
       }
+      if(!this.voice) {
+        return ats.say(words);
+      }
       var self = this;
+      var speechAllTest = false;
       this.wordsGroup = SpeechText.groupWords(words);
       for (var i = 0; i < this.wordsGroup.length; i++) {
         // use speech api SpeechSynthesis
         var word = self.wordsGroup[i];
         var msg = new SpeechSynthesisUtterance();
+        
         if (this.voice.voiceURI) {
           msg.voice = this.voice;
           msg.voiceURI = this.voice.voiceURI;
@@ -394,16 +404,16 @@
         this.options.onendcalled = false;
         this.options.words = msg.text;
         if (i < this.wordsGroup.length - 1 && this.wordsGroup.length > 1) {
-          msg.onend = this.onPartEnd;
+          msg.onend = this.onPartEnd.bind(this);
           if (msg.hasOwnProperty("addEventListener"))
-            msg.addEventListener('end', this.onPartEnd);
+            msg.addEventListener('end', function() { self.onPartEnd() });
 
         } else {
-          msg.onend = self.speechEnd;
+          msg.onend = this.options.speechEnd;
           if (msg.hasOwnProperty("addEventListener")) {
-            msg.addEventListener('end', this.speech_onend);
+            msg.addEventListener('end', this.options.speechEnd);
           }
-          msg.onerror = this.options.speechError;
+        //  msg.onerror = this.options.speechError;
           // TODO 
           //  msg.onpause = this.options.onpause;
           //  msg.onresume = this.options.onresume;
@@ -418,12 +428,15 @@
         if (i == 0) {
           this.currentMsg = msg;
         }
+        speechAllTest = true;
         this.runTTS(msg);
       }
+      
+      return speechAllTest;
 
     },
 
-    runTTS: function () {
+    runTTS: function (msg) {
       var self = this;
       setTimeout(function () {
         self.cancelled = false;
@@ -436,6 +449,7 @@
       this.checkAndCancelTimeout();
       this.cancelled = true;
       speechSynthesis.cancel();
+      return this.cancelled;
     },
 
     // iOS <= 9.x iOS devices not support autospeak we need force user to touch the screen to enactive the speech
@@ -449,7 +463,7 @@
 
     setVolume: function (volume) {
       var v = this.options.volume = volume <= 1 ? volume : 1;
-      for (var i = 0; i < self.utterances.length; i++) {
+      for (var i = 0; i < this.utterances.length; i++) {
         this.utterances[i].volume = v;
       }
     },
@@ -459,7 +473,7 @@
     },
 
     isPlaying: function () {
-      return this.speechSynthesis && this.speechSynthesis.speaking;
+      return speechSynthesis && speechSynthesis.speaking;
     },
 
     speechEnd: function () {
@@ -528,7 +542,7 @@
         this.params.onchuckend();
       }
 
-      this.Dispatch("OnPartEnd");
+      this.dispatch("OnPartEnd");
 
       var i = this.utterances.indexOf(e.utterance);
       this.currentMsg = this.utterances[i + 1];
@@ -544,7 +558,6 @@
         for (var i = 0; i < callbacks.length; i++) {
           callbacks[i]();
         }
-        ////console.log("Dispatched " + name);
         return true;
       } else {
         //Try calling a few ms later
@@ -559,7 +572,7 @@
             ////console.log("Timeout function for " + name)
             self[timeoutCount] = self[timeoutCount] - 1;
 
-            if (self.Dispatch(name) || self[timeoutCount] < 0) {
+            if (self.dispatch(name) || self[timeoutCount] < 0) {
               clearTimeout(self[timeoutName]);
               //if (self[timeoutCount]<0) //console.log("Timeout ran out");
             } else {
@@ -639,16 +652,19 @@
           audio.preload = 'auto';
           this.audioList.push(audio);
           if (!this.isPlaying() && this.audioList.length == 1) {
-            self.audioTrackIndex = 0;
-            self.playAudio();
+            this.audioTrackIndex = 0;
+            this.playAudio();
           }
         } else {
           // if user say a long sentences we suggest to use sentences api
-          if (!SpeechText.isWord(words)) {
-            var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(this.wordsGroup[i]);
-            self.createAudio(word, url);
+          if (!SpeechText.isWord(word)) {
+            var rate = this.options.rate / 2;
+            rate = Math.min(Math.max(rate, 0), 1);
+            var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
+            this.createAudio(word, url);
           } else {
-            this.getAudio('single', words, function (res) {
+            var self = this;
+            this.getAudio('single', word, function (res) {
               if (res.errcode == 0) {
                 src = res.data;
                 self.createAudio(word, src);
@@ -674,7 +690,6 @@
     },
 
     cancel: function () {
-      this.checkAndCancelTimeout();
       if (this.currentAudio != null) {
         this.currentAudio.pause();
       }
@@ -738,7 +753,6 @@
       audio.playbackRate = 1;
       audio.preload = 'auto';
       audio.load();
-
       this.audioList.push(audio);
       this.addPreLoadAudio(word, src);
       if (!this.isPlaying() && this.audioList.length == 1) {
@@ -769,12 +783,15 @@
     },
 
     audioPlayFinish: function (e) {
-      this.checkAndCancelTimeout();
       if (this.audioTrackIndex <= this.audioList.length - 1) {
         this.audioTrackIndex++;
         this.playAudio();
       }
 
+    },
+    
+    clearAudio: function() {
+      return this.audioList = [];
     },
 
     getAudio: function (type, q, callback, isCache) {
@@ -803,13 +820,13 @@
             //On IOS, sometimes getVoices is just empty, but speech works. So we use a cached voice collection.
             if (window.speechSynthesis != null) {
               if (UA.isIOS()) {
-                vanspeak = new TTS(voices);
+                vanspeak.setVoices(voices);
               }
             }
           }
         } else {
-          clearInterval(gsvinterval);
-          vanspeak = new TTS(voices);
+          clearInterval(gsvinterval);          
+          vanspeak.setVoices(voices);
           if (!vanspeak.voice) {
             vanspeak = ats;
           }
