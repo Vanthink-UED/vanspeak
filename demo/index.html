@@ -111,7 +111,7 @@
       <p>
         <button class="btn btn-primary js-speak-text">Speak Text</button>
       </p>
-      <p><audio controls id="a" src="http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=&rate=0.35&t=devilishly"></audio></p>
+      <p><audio controls preload="auto" id="a" src="http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=&rate=0.35&t=devilishly"></audio></p>
       <p>
         <button class="btn btn-primary js-speak-url">Speak url</button>
         <button class="js-speak-a btn btn-primary">Speak A</button>
@@ -134,7 +134,11 @@
   </script>
   <script src='http://s1.vued.vanthink.cn/d59f937c159f/jquery-2.2.1.min.js'></script>
   <script src='../src/vanspeak-1.0.2.js'></script>
+  <script src='./js/audio.min.js'></script>
   <script type="text/javascript">
+     audiojs.events.ready(function() {
+      var as = audiojs.createAll();
+    });
     var H = $('.doc-hd').height();
     $(function() {
       
