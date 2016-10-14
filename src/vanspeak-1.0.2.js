@@ -579,30 +579,35 @@
 
   // 使用音频的发音  
   function AudioTTS() {
-      this.apis = {
-        "single": "http://api.vanthink.cn/api/audio/index?t=",
-        "multi": "http://api.vanthink.cn/api/audio/multi?t=",
-        "sentence": "http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=",
-      };
-      this.audioList = [];
-      // the audio has finished list
-      this.audioPlayedList = [];
-      // preload audio list
-      this.preloadAudioList = [];
-      this.defaultOptions = {
-        'rate': 0.7,
-        'volume': 1,
-        // max words num for better experence  so we limit max words 
-        'maxWordNum': 100,
-        'speechStart': function () {},
-        'speechEnd': function () {},
-        'speechError': function () {
-          console.warn('Voice not workong!');
-        }
-      };
-    
-      
-    }
+    this.apis = {
+      "single": "http://api.vanthink.cn/api/audio/index?t=",
+      "multi": "http://api.vanthink.cn/api/audio/multi?t=",
+      "sentence": "http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=",
+    };
+    this.audioList = [];
+    // the audio has finished list
+    this.audioPlayedList = [];
+    // preload audio list
+    this.preloadAudioList = [];
+    this.defaultOptions = {
+      'rate': 0.7,
+      'volume': 1,
+      // max words num for better experence  so we limit max words 
+      'maxWordNum': 100,
+      'speechStart': function () {},
+      'speechEnd': function () {},
+      'speechError': function () {
+        console.warn('Voice not workong!');
+      }
+    };
+
+    var audio = new Audio();
+    audio.style.width = 0;
+    audio.style.position = 'absolute';
+    audio.style.left = '-5000px';
+    document.body.appendChild(audio);
+    this.audio = audio;  
+  }
     // keep the same api whidth TTS  
   AudioTTS.prototype = {
     say: function (words, options) {
@@ -644,7 +649,7 @@
           } else {
             var self = this;
             var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
-            this.createAudio(word, url,true);
+            this.playAudio(url,true);
             this.getAudio('single', word, function (res) {
               if (res.errcode == 0) {
                 src = res.data;
@@ -721,50 +726,57 @@
       return false;
     },
 
-    addPreLoadAudio: function (word, src) {
+    addPreLoadAudio: function (word, src,noPreload) {
+      var hasThisKey = this.findPreLoadAudio(word);
+      if(!hasThisKey && !noPreload) {
+        this.loadAudio(src); 
+      }
       this.preloadAudioList.push({
         key: word,
         src: src
       });
     },
 
-    createAudio: function (word, src,noCache) {
-      var audio = document.createElement("AUDIO");
-      audio.src = src;
-      audio.playbackRate = 1;
-      audio.preload = 'auto';
-      audio.load();
-      if(noCache) {
-        this.playAudio(audio);
-        return;
-      }
-      this.audioList.push(audio);
-      this.addPreLoadAudio(word, src);
+    createAudio: function (word, src) {
+      this.audioList.push({
+        key: word,
+        src: src,
+      });
+      this.addPreLoadAudio(word, src,true);
       if (!this.isPlaying() && this.audioList.length == 1) {
         this.audioTrackIndex = 0;
         this.playAudio();
       }
     },
+    
+    loadAudio(src) {
+      var audio = document.createElement("AUDIO");
+      audio.src = src;
+      audio.playbackRate = 1;
+      audio.preload = 'auto';
+      audio.load();  
+    },
 
-    playAudio: function (audio) {
-      
-      if(!audio) {
+    playAudio: function (src) {
+      var self = this;
+      if(!src) {
          if (this.audioTrackIndex == this.audioList.length) {
           return;
         }
-        this.currentAudio = this.audioList[this.audioTrackIndex];
-        this.audioPlayedList.push(this.currentAudio);
-        audio = this.currentAudio;
+        self.audio.src = this.audioList[this.audioTrackIndex]['src'];
+        this.audioPlayedList.push(this.audioList[this.audioTrackIndex]);
+      }else {
+        self.audio.src = src
       }
 
       setTimeout(function () {
-        audio.playbackRate = 1;
+        self.audio.playbackRate = 1;
       }, 50)
-      audio.onloadedmetadata = function () {
-        audio.play();
+      self.audio.onloadedmetadata = function () {
+        self.audio.play();
       }
-      audio.play();
-      audio.addEventListener('ended', this.audioPlayFinish.bind(this));
+      self.audio.play();
+      self.audio.addEventListener('ended', this.audioPlayFinish.bind(this));
     },
 
     audioPlayFinish: function (e) {
