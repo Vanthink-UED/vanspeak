@@ -729,7 +729,6 @@
     createAudio: function (word, src,noCache) {
       var audio = document.createElement("AUDIO");
       audio.src = src;
-      alert(src);
       audio.playbackRate = 1;
       audio.preload = 'auto';
       audio.load();
@@ -795,7 +794,7 @@
   var vanspeak = null,
     ats = new AudioTTS();
 
-  if (typeof (window.speechSynthesis) == 'undefined') {
+  if (typeof (window.speechSynthesis) == 'undefined' && false) {
     var voiceFindTry = 0;
     var voices = window.speechSynthesis.getVoices();
     vanspeak = new TTS(voices);
