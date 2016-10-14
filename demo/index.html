@@ -102,6 +102,14 @@
       ];</code></pre>
       <p class="form-group">
         <button class="btn btn-primary js-test-speak-sentence" data-word="hello">Speak</button>
+        <button class="btn btn-primary js-test-blob">Save Data</button>
+      </p>
+      <p class="form-group">
+        <input type="text"  class="form-control js-test-text"/>
+        
+      </p>
+      <p>
+        <button class="btn btn-primary js-speak-text">Speak Text</button>
       </p>
     </div>
     <div class="doc-ft">
@@ -145,6 +153,12 @@
       });
       $('.js-test-speak-sentence').on('click',function() {
         vanspeak.say(testSetences[i++%3]);
+      });
+      $('.js-test-blob').on('click',function() {
+        vanspeak.say(testSetences[i++%3]);
+      });
+      $('.js-speak-text').on('click',function() {
+        vanspeak.say($('.js-test-text').val());
       });
       // scroll
       $(window).on('scroll', function() {

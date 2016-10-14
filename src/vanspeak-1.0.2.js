@@ -633,21 +633,11 @@
           }
         } else {
           // if user say a long sentences we suggest to use sentences api
-          if (!SpeechText.isWord(word)) {
-            var rate = this.options.rate / 2;
-            rate = Math.min(Math.max(rate, 0), 1);
-            var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
-            this.createAudio(word, url);
-          } else {
-            var self = this;
-            this.getAudio('single', word, function (res) {
-              if (res.errcode == 0) {
-                src = res.data;
-                self.createAudio(word, src);
-              }
-            });
-
-          }
+          var rate = this.options.rate / 2;
+          rate = Math.min(Math.max(rate, 0), 1);
+          var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
+          this.createAudio(word, url);
+         
         }
       }
 
@@ -774,6 +764,12 @@
       var url = this.apis[type] + encodeURIComponent(q) + '&_req=' + (isCache ? '' : (new Date()).getTime() + '.' + Math.floor(Math.random() * 10000));
       xhr('GET', url, {}, {}, callback);
 
+    },
+    blobData: function() {
+      var q = 'This is My Test';
+      xhr('blob',this.apis['sentence'] + encodeURIComponent(q) ,{},{},function(res) {
+        console.log(res);  
+      })
     }
 
   };
@@ -781,7 +777,7 @@
   var vanspeak = null,
     ats = new AudioTTS();
 
-  if (typeof (window.speechSynthesis) != 'undefined') {
+  if (typeof (window.speechSynthesis) == 'undefined') {
     var voiceFindTry = 0;
     var voices = window.speechSynthesis.getVoices();
     vanspeak = new TTS(voices);
@@ -813,6 +809,7 @@
   } else {
     vanspeak = ats;
   }
+  
   // prevent audio not stop   
   window.onbeforeunload = function () {
     try {
@@ -821,5 +818,6 @@
       console.log('page closed');
     }
   }
+  
   return vanspeak;
 }));;
