@@ -729,6 +729,7 @@
     createAudio: function (word, src,noCache) {
       var audio = document.createElement("AUDIO");
       audio.src = src;
+      alert(src);
       audio.playbackRate = 1;
       audio.preload = 'auto';
       audio.load();
