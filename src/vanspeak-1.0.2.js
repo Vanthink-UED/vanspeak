@@ -600,6 +600,8 @@
           console.warn('Voice not workong!');
         }
       };
+    
+      
     }
     // keep the same api whidth TTS  
   AudioTTS.prototype = {
@@ -759,7 +761,7 @@
         audio.playbackRate = 1;
       }, 50)
       audio.onloadedmetadata = function () {
-       // audio.play();
+        audio.play();
       }
       audio.play();
       audio.addEventListener('ended', this.audioPlayFinish.bind(this));
