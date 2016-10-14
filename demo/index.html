@@ -111,6 +111,9 @@
       <p>
         <button class="btn btn-primary js-speak-text">Speak Text</button>
       </p>
+      <p>
+        <button class="btn btn-primary js-speak-url">Speak url</button>
+      </p>
     </div>
     <div class="doc-ft">
       All Rights Reserved By Vanthink-UED
@@ -160,6 +163,17 @@
       $('.js-speak-text').on('click',function() {
         vanspeak.say($('.js-test-text').val());
       });
+      
+      $('.js-speak-url').on('click',function() {
+        var audio = new Audio();
+        audio.src = 'http://res.cloud.vanthink.cn//audio/1c25232560542f83cf5519ff133bc4f4--500--350.mp3';
+        setTimeout(function () {
+          audio.playbackRate = 1;
+        }, 50)
+        audio.play();
+        document.body.appendChild(audio);
+     
+      })
       // scroll
       $(window).on('scroll', function() {
         var ch = $(this).scrollTop();

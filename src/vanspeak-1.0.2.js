@@ -773,7 +773,7 @@
         self.audio.playbackRate = 1;
       }, 50)
       self.audio.onloadedmetadata = function () {
-        self.audio.play();
+        // self.audio.play();
       }
       self.audio.play();
       self.audio.addEventListener('ended', this.audioPlayFinish.bind(this));
