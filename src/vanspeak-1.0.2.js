@@ -635,9 +635,22 @@
           // if user say a long sentences we suggest to use sentences api
           var rate = this.options.rate / 2;
           rate = Math.min(Math.max(rate, 0), 1);
-          var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
-          this.createAudio(word, url);
-         
+          if (!SpeechText.isWord(word)) {
+           
+            var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
+            this.createAudio(word, url);
+          } else {
+            var self = this;
+            var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
+            this.createAudio(word, url,true);
+            this.getAudio('single', word, function (res) {
+              if (res.errcode == 0) {
+                src = res.data;
+                self.addPreLoadAudio(word, src);
+              }
+            });
+
+          }
         }
       }
 
@@ -713,39 +726,43 @@
       });
     },
 
-    createAudio: function (word, src) {
+    createAudio: function (word, src,noCache) {
       var audio = document.createElement("AUDIO");
       audio.src = src;
       audio.playbackRate = 1;
       audio.preload = 'auto';
       audio.load();
+      if(noCache) {
+        this.playAudio(audio);
+        return;
+      }
       this.audioList.push(audio);
       this.addPreLoadAudio(word, src);
       if (!this.isPlaying() && this.audioList.length == 1) {
         this.audioTrackIndex = 0;
         this.playAudio();
       }
-
     },
 
-    playAudio: function () {
-      if (this.audioTrackIndex == this.audioList.length) {
-        return;
+    playAudio: function (audio) {
+      
+      if(!audio) {
+         if (this.audioTrackIndex == this.audioList.length) {
+          return;
+        }
+        this.currentAudio = this.audioList[this.audioTrackIndex];
+        this.audioPlayedList.push(this.currentAudio);
+        audio = this.currentAudio;
       }
-      this.currentAudio = this.audioList[this.audioTrackIndex];
-
-      var audio = this.currentAudio;
-
-      this.audioPlayedList.push(audio);
 
       setTimeout(function () {
         audio.playbackRate = 1;
       }, 50)
       audio.onloadedmetadata = function () {
-        audio.play();
+       // audio.play();
       }
-      this.currentAudio.play();
-      this.currentAudio.addEventListener('ended', this.audioPlayFinish.bind(this));
+      audio.play();
+      audio.addEventListener('ended', this.audioPlayFinish.bind(this));
     },
 
     audioPlayFinish: function (e) {
