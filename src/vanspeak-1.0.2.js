@@ -142,7 +142,7 @@
       return ua.indexOf('chrome') > -1;
     },
     isSafari: function () {
-      return ua.indexOf('safari') > -1 && ! (ua.indexOf('chrome') > -1);
+      return ua.indexOf('safari') > -1 && !(ua.indexOf('chrome') > -1);
     },
 
 
@@ -248,7 +248,7 @@
   // TTS class
   function TTS(voices, options) {
     // we only provide english 
-    
+
 
     this.defaultOptions = {
       'rate': 0.7,
@@ -269,8 +269,8 @@
 
 
   TTS.prototype = {
-    
-    setVoices: function(voices) {
+
+    setVoices: function (voices) {
       var VOICES = {
         'us': [
           {
@@ -358,7 +358,7 @@
         }, 100);
         self.startHandle();
       }
-      if(!this.voice) {
+      if (!this.voice) {
         return ats.say(words);
       }
       var self = this;
@@ -368,7 +368,7 @@
         // use speech api SpeechSynthesis
         var word = self.wordsGroup[i];
         var msg = new SpeechSynthesisUtterance();
-        
+
         if (this.voice.voiceURI) {
           msg.voice = this.voice;
           msg.voiceURI = this.voice.voiceURI;
@@ -393,14 +393,16 @@
         if (i < this.wordsGroup.length - 1 && this.wordsGroup.length > 1) {
           msg.onend = this.onPartEnd.bind(this);
           if (msg.hasOwnProperty("addEventListener"))
-            msg.addEventListener('end', function() { self.onPartEnd() });
+            msg.addEventListener('end', function () {
+              self.onPartEnd()
+            });
 
         } else {
           msg.onend = this.options.speechEnd;
           if (msg.hasOwnProperty("addEventListener")) {
             msg.addEventListener('end', this.options.speechEnd);
           }
-        //  msg.onerror = this.options.speechError;
+          //  msg.onerror = this.options.speechError;
           // TODO 
           //  msg.onpause = this.options.onpause;
           //  msg.onresume = this.options.onresume;
@@ -418,7 +420,7 @@
         speechAllTest = true;
         this.runTTS(msg);
       }
-      
+
       return speechAllTest;
 
     },
@@ -557,7 +559,7 @@
 
             if (self.dispatch(name) || self[timeoutCount] < 0) {
               clearTimeout(self[timeoutName]);
-            } 
+            }
           }, 50);
         }
 
@@ -579,35 +581,35 @@
 
   // 使用音频的发音  
   function AudioTTS() {
-    this.apis = {
-      "single": "http://api.vanthink.cn/api/audio/index?t=",
-      "multi": "http://api.vanthink.cn/api/audio/multi?t=",
-      "sentence": "http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=",
-    };
-    this.audioList = [];
-    // the audio has finished list
-    this.audioPlayedList = [];
-    // preload audio list
-    this.preloadAudioList = [];
-    this.defaultOptions = {
-      'rate': 0.7,
-      'volume': 1,
-      // max words num for better experence  so we limit max words 
-      'maxWordNum': 100,
-      'speechStart': function () {},
-      'speechEnd': function () {},
-      'speechError': function () {
-        console.warn('Voice not workong!');
-      }
-    };
+      this.apis = {
+        "single": "http://api.vanthink.cn/api/audio/index?t=",
+        "multi": "http://api.vanthink.cn/api/audio/multi?t=",
+        "sentence": "http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=",
+      };
+      this.audioList = [];
+      // the audio has finished list
+      this.audioPlayedList = [];
+      // preload audio list
+      this.preloadAudioList = [];
+      this.defaultOptions = {
+        'rate': 0.7,
+        'volume': 1,
+        // max words num for better experence  so we limit max words 
+        'maxWordNum': 100,
+        'speechStart': function () {},
+        'speechEnd': function () {},
+        'speechError': function () {
+          console.warn('Voice not workong!');
+        }
+      };
 
-    var audio = new Audio();
-    audio.style.width = 0;
-    audio.style.position = 'absolute';
-    audio.style.left = '-5000px';
-    document.body.appendChild(audio);
-    this.audio = audio;  
-  }
+      var audio = new Audio();
+      audio.style.width = 0;
+      audio.style.position = 'absolute';
+      audio.style.left = '-5000px';
+      document.body.appendChild(audio);
+      this.audio = audio;
+    }
     // keep the same api whidth TTS  
   AudioTTS.prototype = {
     say: function (words, options) {
@@ -643,13 +645,13 @@
           var rate = this.options.rate / 2;
           rate = Math.min(Math.max(rate, 0), 1);
           if (!SpeechText.isWord(word)) {
-           
+
             var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
             this.createAudio(word, url);
           } else {
             var self = this;
             var url = this.apis['sentence'] + '&rate=' + rate + '&t=' + encodeURIComponent(word);
-            this.playAudio(url,true);
+            this.playAudio(url, true);
             this.getAudio('single', word, function (res) {
               if (res.errcode == 0) {
                 src = res.data;
@@ -694,7 +696,7 @@
       }
       var newWordArr = [];
       for (var i = 0; i < arr.length; i++) {
-        if (SpeechText.isWord(arr[i]) && this.preloadAudioList.indexOf(arr[i]) != -1) {
+        if (SpeechText.isWord(arr[i]) && this.preloadAudioList.indexOf(arr[i]) == -1) {
           newWordArr.push(arr[i]);
         }
       }
@@ -726,10 +728,10 @@
       return false;
     },
 
-    addPreLoadAudio: function (word, src,noPreload) {
+    addPreLoadAudio: function (word, src, noPreload) {
       var hasThisKey = this.findPreLoadAudio(word);
-      if(!hasThisKey && !noPreload) {
-        this.loadAudio(src); 
+      if (!hasThisKey && !noPreload) {
+        this.loadAudio(src);
       }
       this.preloadAudioList.push({
         key: word,
@@ -742,30 +744,30 @@
         key: word,
         src: src,
       });
-      this.addPreLoadAudio(word, src,true);
+      this.addPreLoadAudio(word, src, true);
       if (!this.isPlaying() && this.audioList.length == 1) {
         this.audioTrackIndex = 0;
         this.playAudio();
       }
     },
-    
-    loadAudio(src) {
+
+    loadAudio: function(src) {
       var audio = document.createElement("AUDIO");
       audio.src = src;
       audio.playbackRate = 1;
       audio.preload = 'auto';
-      audio.load();  
+      audio.load();
     },
 
     playAudio: function (src) {
       var self = this;
-      if(!src) {
-         if (this.audioTrackIndex == this.audioList.length) {
+      if (!src) {
+        if (this.audioTrackIndex == this.audioList.length) {
           return;
         }
         self.audio.src = this.audioList[this.audioTrackIndex]['src'];
         this.audioPlayedList.push(this.audioList[this.audioTrackIndex]);
-      }else {
+      } else {
         self.audio.src = src
       }
 
@@ -773,21 +775,22 @@
         self.audio.playbackRate = 1;
       }, 50)
       self.audio.onloadedmetadata = function () {
-        // self.audio.play();
+         self.audio.play();
       }
       self.audio.play();
       self.audio.addEventListener('ended', this.audioPlayFinish.bind(this));
     },
 
     audioPlayFinish: function (e) {
+      alert( this.audioTrackIndex);
       if (this.audioTrackIndex <= this.audioList.length - 1) {
         this.audioTrackIndex++;
         this.playAudio();
       }
 
     },
-    
-    clearAudio: function() {
+
+    clearAudio: function () {
       return this.audioList = [];
     },
 
@@ -796,10 +799,11 @@
       xhr('GET', url, {}, {}, callback);
 
     },
-    blobData: function() {
+    
+    blobData: function () {
       var q = 'This is My Test';
-      xhr('blob',this.apis['sentence'] + encodeURIComponent(q) ,{},{},function(res) {
-        console.log(res);  
+      xhr('blob', this.apis['sentence'] + encodeURIComponent(q), {}, {}, function (res) {
+        console.log(res);
       })
     }
 
@@ -808,7 +812,7 @@
   var vanspeak = null,
     ats = new AudioTTS();
 
-  if (typeof (window.speechSynthesis) == 'undefined' && false) {
+  if (typeof (window.speechSynthesis) != 'undefined') {
     var voiceFindTry = 0;
     var voices = window.speechSynthesis.getVoices();
     vanspeak = new TTS(voices);
@@ -828,7 +832,7 @@
             }
           }
         } else {
-          clearInterval(gsvinterval);          
+          clearInterval(gsvinterval);
           vanspeak.setVoices(voices);
           if (!vanspeak.voice) {
             vanspeak = ats;
@@ -840,7 +844,7 @@
   } else {
     vanspeak = ats;
   }
-  
+
   // prevent audio not stop   
   window.onbeforeunload = function () {
     try {
@@ -849,6 +853,6 @@
       console.log('page closed');
     }
   }
-  
+
   return vanspeak;
-}));;
+}));

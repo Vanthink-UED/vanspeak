@@ -108,6 +108,11 @@ pre{
         width: 100%'
     }
 }
+@media all and (max-width:768px) {
+  nav{
+    display: none !important;
+  }
+}
 /** view doc https://highlightjs.org **/
 .hljs {
   display: block;
