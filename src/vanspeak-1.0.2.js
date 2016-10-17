@@ -777,6 +777,7 @@
       self.audio.onloadedmetadata = function () {
          self.audio.play();
       }
+      self.audio.currentTime = 0;
       self.audio.play();
       self.audio.addEventListener('ended', this.audioPlayFinish.bind(this));
     },
