@@ -631,11 +631,10 @@
         var cacheAudio = this.findPreLoadAudio(word);
         if (cacheAudio !== false) {
           src = cacheAudio['src'];
-          var audio = document.createElement("AUDIO");
-          audio.src = src;
-          audio.playbackRate = 1;
-          audio.preload = 'auto';
-          this.audioList.push(audio);
+          this.audioList.push({
+            key: word,
+            src: src,
+          });
           if (!this.isPlaying() && this.audioList.length == 1) {
             this.audioTrackIndex = 0;
             this.playAudio();
@@ -752,11 +751,12 @@
     },
 
     loadAudio: function(src) {
-      var audio = document.createElement("AUDIO");
-      audio.src = src;
-      audio.playbackRate = 1;
-      audio.preload = 'auto';
-      audio.load();
+      var iframe = document.createElement('iframe');
+      iframe.style.position = 'absolute';
+      iframe.style.width = 0;
+      iframe.style.left = '-5000px';
+      iframe.src = src;
+      document.body.appendChild(iframe);
     },
 
     playAudio: function (src) {
