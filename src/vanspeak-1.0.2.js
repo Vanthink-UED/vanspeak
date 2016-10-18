@@ -607,6 +607,7 @@
       audio.style.width = 0;
       audio.style.position = 'absolute';
       audio.style.left = '-5000px';
+      audio.loop = false;
       document.body.appendChild(audio);
       this.audio = audio;
     }
@@ -775,15 +776,28 @@
         self.audio.playbackRate = 1;
       }, 50)
       self.audio.onloadedmetadata = function () {
-         self.audio.play();
+         //self.audio.play();
+        
       }
       self.audio.currentTime = 0;
       self.audio.play();
-      self.audio.addEventListener('ended', this.audioPlayFinish.bind(this));
+      
+      if('onended' in self.audio) {
+         self.audio.addEventListener('ended', function(e) {
+            self.audioPlayFinish(e);
+        });  
+      }else{
+        self.audio.addEventListener('timeupdate', function(e) {
+          if(this.currentTime == this.duration) {
+              self.audioPlayFinish(e);
+          }  
+        });
+      }
+      
     },
 
     audioPlayFinish: function (e) {
-      alert( this.audioTrackIndex);
+      
       if (this.audioTrackIndex <= this.audioList.length - 1) {
         this.audioTrackIndex++;
         this.playAudio();
@@ -813,7 +827,7 @@
   var vanspeak = null,
     ats = new AudioTTS();
 
-  if (typeof (window.speechSynthesis) != 'undefined') {
+  if (typeof (window.speechSynthesis) != 'undefined' && false) {
     var voiceFindTry = 0;
     var voices = window.speechSynthesis.getVoices();
     vanspeak = new TTS(voices);
