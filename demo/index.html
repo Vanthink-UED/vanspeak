@@ -111,7 +111,7 @@
       <p>
         <button class="btn btn-primary js-speak-text">Speak Text</button>
       </p>
-      <p><audio controls preload="auto" onended="c()" id="a" src="http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=&rate=0.35&t=devilishly"></audio></p>
+      <p><audio controls preload="auto" onended="c()" id="a" src="http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=&rate=0.35&t=I remained the canyon for about half an hour, and I asked myself"></audio></p>
       <p>
         <button class="btn btn-primary js-speak-url">Speak url</button>
         <button class="js-speak-a btn btn-primary">Speak A</button>
@@ -133,8 +133,8 @@
     hljs.initHighlightingOnLoad();
   </script>
   <script src='http://s1.vued.vanthink.cn/d59f937c159f/jquery-2.2.1.min.js'></script>
-  <script src='../src/vanspeak-1.0.2.js'></script>
-  <script sccrc='./js/audio.min.js'></script>
+  <script srcvv='../src/vanspeak-1.0.2.js'></script>
+  <script src='./js/audio.min.js'></script>
   <script type="text/javascript">
     
     var H = $('.doc-hd').height();
@@ -162,7 +162,7 @@
         vanspeak.say(testSetences[i++%3]);
       });
       $('.js-test-blob').on('click',function() {
-        vanspeak.say(testSetences[i++%3]);
+        vanspeak.blobData('./test.mp3');
       });
       $('.js-speak-text').on('click',function() {
         vanspeak.say($('.js-test-text').val());
@@ -170,7 +170,7 @@
       
       $('.js-speak-url').on('click',function() {
         var audio = new Audio();
-        audio.src = 'http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=&rate=0.35&t=devilishly';
+        audio.src = 'http://v.vanthink.cn/?tl=en-US&sv=&vn=&pitch=0.5&vol=1&t=&rate=0.35&t=I remained the canyon for about half an hour, and I asked myself';
         setTimeout(function () {
           audio.playbackRate = 1;
         }, 50)
@@ -196,7 +196,7 @@
       
     })
     function c() {
-        console.log(12);
+        alert(12);
       }
   </script>
 

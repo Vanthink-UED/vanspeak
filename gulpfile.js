@@ -23,7 +23,8 @@ gulp.task('webserver', function () {
       livereload: true,
       port: 9001,
       directoryListing: false,
-      open: true
+      open: true,
+      host: '0.0.0.0'
     }));
 });
 
