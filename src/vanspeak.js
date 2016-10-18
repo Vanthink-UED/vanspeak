@@ -758,7 +758,7 @@
       iframe.style.width = 0;
       iframe.style.left = '-5000px';
       iframe.src = src;
-      document.body.appendChild(iframe);
+      iframe.onload = function() {};
     },
 
     playAudio: function (src) {
