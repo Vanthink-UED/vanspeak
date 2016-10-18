@@ -780,12 +780,12 @@
       }, 50)
       self.audio.onloadedmetadata = function () {
          //self.audio.play();
-        
+         console.log(this.duration);
       }
       
       self.audio.play();
       
-      if('onended' in self.audio && false) {
+      if('onended' in self.audio) {
          self.audio.addEventListener('ended', function(e) {
             self.audioPlayFinish(e);
         });  
