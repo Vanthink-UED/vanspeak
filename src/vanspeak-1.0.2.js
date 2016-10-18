@@ -779,7 +779,7 @@
          //self.audio.play();
         
       }
-      self.audio.currentTime = 0;
+      
       self.audio.play();
       
       if('onended' in self.audio) {
@@ -789,6 +789,7 @@
       }else{
         self.audio.addEventListener('timeupdate', function(e) {
           if(this.currentTime == this.duration) {
+              self.audio.currentTime = 0;
               self.audioPlayFinish(e);
           }  
         });
