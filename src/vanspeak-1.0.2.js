@@ -780,13 +780,24 @@
         self.audio.playbackRate = 1;
       }, 50)
       self.audio.onloadedmetadata = function () {
-         //self.audio.play();
+         self.audio.play();
          console.log(this.duration);
       }
       
-      self.audio.play();
+      // self.audio.play();
       
-      
+      if('onended' in self.audio) {
+         self.audio.addEventListener('ended', function(e) {
+            self.audioPlayFinish(e);
+        });  
+      }else{
+        self.audio.addEventListener('timeupdate', function(e) {
+          if(this.currentTime == this.duration) {
+              
+              self.audioPlayFinish(e);
+          }  
+        });
+      }
       
     },
 
