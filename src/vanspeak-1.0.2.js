@@ -608,6 +608,9 @@
       audio.style.position = 'absolute';
       audio.style.left = '-5000px';
       audio.loop = false;
+      audio.onended = function() {
+        console.log(1);
+      }
       document.body.appendChild(audio);
       this.audio = audio;
     }
@@ -782,7 +785,7 @@
       
       self.audio.play();
       
-      if('onended' in self.audio) {
+      if('onended' in self.audio && false) {
          self.audio.addEventListener('ended', function(e) {
             self.audioPlayFinish(e);
         });  
