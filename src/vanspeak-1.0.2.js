@@ -611,8 +611,9 @@
       audio.onended = function() {
         console.log(1);
       }
-      document.body.appendChild(audio);
+     
       this.audio = audio;
+      document.body.appendChild(audio);
     }
     // keep the same api whidth TTS  
   AudioTTS.prototype = {
@@ -785,18 +786,7 @@
       
       self.audio.play();
       
-      if('onended' in self.audio) {
-         self.audio.addEventListener('ended', function(e) {
-            self.audioPlayFinish(e);
-        });  
-      }else{
-        self.audio.addEventListener('timeupdate', function(e) {
-          if(this.currentTime == this.duration) {
-              self.audio.currentTime = 0;
-              self.audioPlayFinish(e);
-          }  
-        });
-      }
+      
       
     },
 
