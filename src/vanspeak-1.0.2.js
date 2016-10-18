@@ -784,8 +784,8 @@
          console.log(this.duration);
       }
       
-      // self.audio.play();
-      
+      self.audio.play();
+      self.audio.currentTime = 0;
       if('onended' in self.audio) {
          self.audio.addEventListener('ended', function(e) {
             self.audioPlayFinish(e);
