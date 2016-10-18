@@ -603,17 +603,16 @@
         }
       };
 
-      var audio = new Audio();
-      audio.style.width = 0;
-      audio.style.position = 'absolute';
-      audio.style.left = '-5000px';
-      audio.loop = false;
-      audio.onended = function() {
+      this.audio = new Audio();
+      this.audio.style.width = 0;
+      this.audio.style.position = 'absolute';
+      this.audio.style.left = '-5000px';
+      this.audio.loop = false;
+      this.audio.onended = function() {
         console.log(1);
       }
      
-      this.audio = audio;
-      document.body.appendChild(audio);
+      document.body.appendChild(this.audio);
     }
     // keep the same api whidth TTS  
   AudioTTS.prototype = {
