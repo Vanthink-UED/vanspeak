@@ -2,7 +2,7 @@
   "name": "vanspeak",
   "version": "1.0.2",
   "description": "a plugin for text to speech",
-  "main": "index.js",
+  "main": "src/vanspeak.js",
   "scripts": {
     "test": "karma start karma.conf.js",
     "build": "gulp js",
