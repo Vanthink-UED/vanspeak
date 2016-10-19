@@ -826,7 +826,7 @@
   var vanspeak = null,
       ats = new AudioTTS();
 
-  if (typeof (window.speechSynthesis) != 'undefined' && false) {
+  if (typeof (window.speechSynthesis) != 'undefined') {
     var voiceFindTry = 0;
     var voices = window.speechSynthesis.getVoices();
     vanspeak = new TTS(voices);
