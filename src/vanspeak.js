@@ -1,6 +1,6 @@
 /** vanspeak
  *  a plugin to speak your words
- *  v 1.0.2
+ *  v 1.0.2.1
  * the first version some params was not supported beacuse we force users to accept US accent and the speed
  **/
 (function (root, factory) {
@@ -144,11 +144,13 @@
     isSafari: function () {
       return ua.indexOf('safari') > -1 && !(ua.indexOf('chrome') > -1);
     },
-
+    isUCBrowser: function() {
+      return ua.indexOf('ucbrowser') > -1;
+    }
 
   };
 
-  // 文本分析
+  // Text analyse
   var SpeechText = {
     // check the word is the normal word we are not supporting sentences Cache
     isWord: function (word, maxWordNum) {
@@ -209,7 +211,7 @@
         if (tmptxt.length > 0) {
           wordsGroup.push(tmptxt);
         }
-        return wordsGroup;
+        return [wordsGroup.join(' ')];
       } else {
         return [words];
       }
@@ -248,8 +250,6 @@
   // TTS class
   function TTS(voices, options) {
     // we only provide english 
-
-
     this.defaultOptions = {
       'rate': 0.7,
       'volume': 1,
@@ -605,11 +605,11 @@
 
       this.audio = new Audio();
       this.audio.style.width = 0;
+      this.audio.preload = 'auto';
       this.audio.style.position = 'absolute';
       this.audio.style.left = '-5000px';
       this.audio.loop = false;
-    
-     
+      this.audio.setAttribute('id','tts');
       document.body.appendChild(this.audio);
     }
     // keep the same api whidth TTS  
@@ -624,7 +624,6 @@
       }
       // words detect and group
       this.wordsGroup = SpeechText.groupWords(words);
-
       for (var i = 0; i < this.wordsGroup.length; i++) {
         // use speech api SpeechSynthesis
         var word = this.wordsGroup[i];
@@ -763,35 +762,44 @@
 
     playAudio: function (src) {
       var self = this;
+      var audio = document.querySelector('#tts');
       if (!src) {
         if (this.audioTrackIndex == this.audioList.length) {
           return;
         }
-        self.audio.src = this.audioList[this.audioTrackIndex]['src'];
+        audio.src = this.audioList[this.audioTrackIndex]['src'];
         this.audioPlayedList.push(this.audioList[this.audioTrackIndex]);
       } else {
-        self.audio.src = src
+        audio.src = src
       }
 
       setTimeout(function () {
-        self.audio.playbackRate = 1;
+        audio.playbackRate = 1;
       }, 50)
-      self.audio.onloadedmetadata = function () {
-         self.audio.play();
+      audio.onloadedmetadata = function () {
+         audio.play();
       }
-      
-      self.audio.play();
-      if('onended' in self.audio && false) {
-         self.audio.onended = function(e) {
-            self.audioPlayFinish(e);
+       if('onended' in audio) {
+         audio.onended = function(e) {
+           self.audioPlayFinish(e);
         };  
       }else{
         self.audio.addEventListener('timeupdate', function(e) {
           if(this.currentTime == this.duration) {
+            console.log(this.duration);
+            
+            self.audio.pause();
+            if(UA.isUCBrowser()) {
+              audio.currentTime = 0;
+            }
             self.audioPlayFinish(e);
-          }  
+          }else if(!self.isPlaying()){
+            self.audio.play();  
+          } 
         });
       }
+      
+      audio.play();
       
     },
 
@@ -816,9 +824,9 @@
   };
 
   var vanspeak = null,
-    ats = new AudioTTS();
+      ats = new AudioTTS();
 
-  if (typeof (window.speechSynthesis) != 'undefined') {
+  if (typeof (window.speechSynthesis) != 'undefined' && false) {
     var voiceFindTry = 0;
     var voices = window.speechSynthesis.getVoices();
     vanspeak = new TTS(voices);
