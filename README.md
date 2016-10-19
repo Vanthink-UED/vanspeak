@@ -12,10 +12,17 @@ a plugin for text to speech (<=12KB)
 <script src="./build/vanspeak.min.js"></script>
 
 ```
-Use CDN
+CDN
 ``` html
-<script src="http://s1.vued.vanthink.cn/67f18e9e620c/vanspeak.min.js"></script>
+<script src="http://s1.vued.vanthink.cn/595def687aad/vanspeak.min.js"></script>
 ```
+CMD
+``` js
+define(['vanspeak'],function(vanspeak)) {
+  //TODO
+}
+```
+Also support CMD.
 
 ``` JS
 vanSpeak.say('Hello wolrd');

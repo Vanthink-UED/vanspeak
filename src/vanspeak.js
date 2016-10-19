@@ -1,6 +1,6 @@
 /** vanspeak
  *  a plugin to speak your words
- *  v 1.0.2.1
+ *  v 1.0.2
  * the first version some params was not supported beacuse we force users to accept US accent and the speed
  **/
 (function (root, factory) {
@@ -610,6 +610,25 @@
       this.audio.style.left = '-5000px';
       this.audio.loop = false;
       this.audio.setAttribute('id','tts');
+      var self = this;
+    
+      if('onended' in this.audio) {
+           this.audio.onended = function(e) {
+             self.audioPlayFinish(e);
+          };  
+        }else{
+          this.audio.addEventListener('timeupdate', function(e) {
+            if(this.currentTime == this.duration) {
+              if(!UA.isUCBrowser()) {
+                this.currentTime = 0;
+              }
+              this.pause();
+              self.audioPlayFinish(e);
+            }else if(!self.isPlaying()){
+              self.audio.play();  
+            } 
+          });
+        }
       document.body.appendChild(this.audio);
     }
     // keep the same api whidth TTS  
@@ -765,6 +784,7 @@
       var audio = document.querySelector('#tts');
       if (!src) {
         if (this.audioTrackIndex == this.audioList.length) {
+          audio.src = '';
           return;
         }
         audio.src = this.audioList[this.audioTrackIndex]['src'];
@@ -779,28 +799,11 @@
       audio.onloadedmetadata = function () {
          audio.play();
       }
-       if('onended' in audio) {
-         audio.onended = function(e) {
-           self.audioPlayFinish(e);
-        };  
-      }else{
-        self.audio.addEventListener('timeupdate', function(e) {
-          if(this.currentTime == this.duration) {
-            console.log(this.duration);
-            
-            self.audio.pause();
-            if(UA.isUCBrowser()) {
-              audio.currentTime = 0;
-            }
-            self.audioPlayFinish(e);
-          }else if(!self.isPlaying()){
-            self.audio.play();  
-          } 
-        });
-      }
+      
+      
       
       audio.play();
-      
+      audio.currentTime = 0;
     },
 
     audioPlayFinish: function (e) {
