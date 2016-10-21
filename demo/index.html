@@ -102,7 +102,7 @@
       ];</code></pre>
       <p class="form-group">
         <button class="btn btn-primary js-test-speak-sentence" data-word="hello">Speak</button>
-        <button class="btn btn-primary js-test-blob">Save Data</button>
+        <button class="btn btn-primary js-test-blob">Stop</button>
       </p>
       <p class="form-group">
         <input type="text"  class="form-control js-test-text"/>
@@ -147,7 +147,7 @@
         vanspeak.cancel();
       });
         
-      var testWords = ['devilishly','tricky','track','down','number','additional'];
+      var testWords = ['ask for','at work','at school','at home','number','additional'];
       vanspeak.preAudio(testWords);
       var testSetences = [
         'I by the canyon for about half an hour, and I asked myself. "Is the Grand Canyon the greatest wonder of the natural world?',
@@ -156,7 +156,10 @@
       ];
       var i = 0;
       $('.js-test-speak').on('click',function() {
-        vanspeak.say(testWords[i++%6]);
+        
+        
+        vanspeak.say(testWords[i%6]);
+        i++;
       });
       $('.js-test-speak-sentence').on('click',function() {
         vanspeak.say(testSetences[i++%3]);

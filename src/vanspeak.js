@@ -144,7 +144,7 @@
     isSafari: function () {
       return ua.indexOf('safari') > -1 && !(ua.indexOf('chrome') > -1);
     },
-    isUCBrowser: function() {
+    isUCBrowser: function () {
       return ua.indexOf('ucbrowser') > -1;
     }
 
@@ -159,7 +159,7 @@
       if (word.length > max) {
         return false;
       }
-      if (/^[a-zA-Z\d\._\-\']+$/.test(word)) {
+      if (/^[a-zA-Z\d\.\s_\-\']+$/.test(word)) {
         return true;
       }
       return false;
@@ -609,26 +609,27 @@
       this.audio.style.position = 'absolute';
       this.audio.style.left = '-5000px';
       this.audio.loop = false;
-      this.audio.setAttribute('id','tts');
+      this.audio.setAttribute('id', 'tts');
       var self = this;
-    
-      if('onended' in this.audio) {
-           this.audio.onended = function(e) {
-             self.audioPlayFinish(e);
-          };  
-        }else{
-          this.audio.addEventListener('timeupdate', function(e) {
-            if(this.currentTime == this.duration) {
-              if(!UA.isUCBrowser()) {
-                this.currentTime = 0;
-              }
-              this.pause();
-              self.audioPlayFinish(e);
-            }else if(!self.isPlaying()){
-              self.audio.play();  
-            } 
-          });
-        }
+      try {
+        this.audio.addEventListener('timeupdate', function (e) {
+          if (this.currentTime == this.duration) {
+            if (!UA.isUCBrowser()) {
+             // this.currentTime = 0;
+            }
+            self.audio.pause();
+            self.audioPlayFinish(e);
+          } else if (!self.isPlaying() && UA.isUCBrowser()) {
+            
+            self.audio.play();
+          }
+        });
+      } catch (ew) {
+        this.audio.onended = function (e) {
+          self.audioPlayFinish(e);
+        };
+      }
+
       document.body.appendChild(this.audio);
     }
     // keep the same api whidth TTS  
@@ -725,7 +726,7 @@
         if (res.errcode == 0) {
           for (var i = 0; i < res.data.length; i++) {
             xhr('GET', res.data[i]);
-            self.addPreLoadAudio(arr[i], res.data[i]);
+            self.addPreLoadAudio(newWordArr[i], res.data[i]);
           }
         }
       });
@@ -771,13 +772,13 @@
       }
     },
 
-    loadAudio: function(src) {
+    loadAudio: function (src) {
       var iframe = document.createElement('iframe');
       iframe.style.position = 'absolute';
       iframe.style.width = 0;
       iframe.style.left = '-5000px';
       iframe.src = src;
-      iframe.onload = function() {};
+      iframe.onload = function () {};
     },
 
     playAudio: function (src) {
@@ -786,6 +787,7 @@
       if (!src) {
         if (this.audioTrackIndex == this.audioList.length) {
           audio.src = '';
+          audio.pause();
           return;
         }
         audio.src = this.audioList[this.audioTrackIndex]['src'];
@@ -798,11 +800,11 @@
         audio.playbackRate = 1;
       }, 50)
       audio.onloadedmetadata = function () {
-         audio.play();
+        audio.play();
       }
-      
-      
-      
+
+
+
       audio.play();
       audio.currentTime = 0;
     },
@@ -823,12 +825,12 @@
       xhr('GET', url, {}, {}, callback);
 
     },
-    
+
 
   };
 
   var vanspeak = null,
-      ats = new AudioTTS();
+    ats = new AudioTTS();
 
   if (typeof (window.speechSynthesis) != 'undefined') {
     var voiceFindTry = 0;
