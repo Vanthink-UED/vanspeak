@@ -162,7 +162,7 @@
         vanspeak.say(testSetences[i++%3]);
       });
       $('.js-test-blob').on('click',function() {
-        vanspeak.blobData('./test.mp3');
+        vanspeak.cancel();
       });
       $('.js-speak-text').on('click',function() {
         vanspeak.say($('.js-test-text').val());

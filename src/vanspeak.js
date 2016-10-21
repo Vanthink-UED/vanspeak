@@ -697,8 +697,9 @@
     },
 
     cancel: function () {
-      if (this.currentAudio != null) {
-        this.currentAudio.pause();
+      var audio = document.querySelector('#tts');
+      if (audio != null) {
+        audio.pause();
       }
       this.clearAudio();
 
