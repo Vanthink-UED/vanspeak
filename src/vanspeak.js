@@ -487,7 +487,7 @@
       }
 
       this.onstartFired = true;
-      if (isIOS() || isSafari() || isAndroid()) {
+      if (UA.isIOS() || UA.isSafari() || UA.isAndroid()) {
         if (speakMode === 1)
           self.startTimeout(self.params.words, self.speech_timedout);
 
@@ -517,7 +517,7 @@
 
     onboundary: function (e) {
       var self = this;
-      if (isIOS() && !self.onstartFired) {
+      if (UA.isIOS() && !self.onstartFired) {
         self.startTTS();
       }
     },
