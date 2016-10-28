@@ -13,7 +13,11 @@ gulp.task('js', function () {
     .pipe(rename({
       suffix: '.min'
     }))
-    .pipe(gulp.dest('./build/'))
+    .pipe(gulp.dest('./build/'));
+
+  gulp
+    .src('./build/vanspeak.min.js')
+    .pipe(gulp.dest('./demo/js/'));
 });
 
 gulp.task('webserver', function () {

@@ -222,9 +222,6 @@
       // this is a normal speed 
       var WORDS_PER_MINUTE = 130;
       var multiplier = speed;
-      if (voice.timerSpeed === null) {
-        multiplier = 1;
-      }
       if (multiplier <= 0) {
         return;
       }
@@ -354,7 +351,7 @@
       }
       if (UA.isIOS9() && this.iosVoiceInit === false) {
         setTimeout(function () {
-          self.say(words, params);
+          self.say(words, options);
         }, 100);
         self.startHandle();
       }
@@ -488,11 +485,11 @@
 
       this.onstartFired = true;
       if (UA.isIOS() || UA.isSafari() || UA.isAndroid()) {
-        self.startTimeout(self.params.words, self.speech_timedout);
+        self.startTimeout(self.options.words, self.speech_timedout);
       }
-      self.params.onendcalled = false;
-      if (self.params != null && self.params.onstart != null) {
-        self.params.onstart();
+      self.options.onendcalled = false;
+      if (self.options != null && self.options.onstart != null) {
+        self.options.onstart();
       }
 
     },
@@ -505,9 +502,9 @@
         return;
       }
 
-      if (this.params != null && this.params.onend != null && this.params.onendcalled != true) {
-        this.params.onendcalled = true;
-        this.params.onend();
+      if (this.options != null && this.options.onend != null && this.options.onendcalled != true) {
+        this.options.onendcalled = true;
+        this.options.onend();
 
       }
 
@@ -523,8 +520,8 @@
 
     onPartEnd: function (e) {
 
-      if (this.params != null && this.params.onchuckend != null) {
-        this.params.onchuckend();
+      if (this.options != null && this.options.onchuckend != null) {
+        this.options.onchuckend();
       }
 
       this.dispatch("OnPartEnd");
