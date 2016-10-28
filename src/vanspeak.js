@@ -488,9 +488,7 @@
 
       this.onstartFired = true;
       if (UA.isIOS() || UA.isSafari() || UA.isAndroid()) {
-        if (speakMode === 1)
-          self.startTimeout(self.params.words, self.speech_timedout);
-
+        self.startTimeout(self.params.words, self.speech_timedout);
       }
       self.params.onendcalled = false;
       if (self.params != null && self.params.onstart != null) {
